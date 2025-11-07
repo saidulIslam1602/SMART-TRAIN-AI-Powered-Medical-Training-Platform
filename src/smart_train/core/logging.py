@@ -208,15 +208,24 @@ class MedicalLogger:
             "compliance_event": True
         }
 
-        # Log to main logger
-        getattr(self.logger, level.lower())(message, **log_data)
-
+        # Log to main logger with error handling
+        try:
+            log_method = getattr(self.logger, level.lower(), self.logger.info)
+            log_method(message, **log_data)
+        except Exception as e:
+            # Fallback to basic logging if structured logging fails
+            print(f"Logging error: {e}. Message: {message}")
+        
         # Log to audit trail (avoid 'message' conflict)
-        audit_log_data = {k: v for k, v in log_data.items() if k != 'message'}
-        self.audit_logger.info(
-            f"MEDICAL_EVENT: {event_type} - {message}",
-            extra=audit_log_data
-        )
+        try:
+            audit_log_data = {k: v for k, v in log_data.items() if k != 'message'}
+            self.audit_logger.info(
+                f"MEDICAL_EVENT: {event_type} - {message}",
+                extra=audit_log_data
+            )
+        except Exception as e:
+            # Fallback logging for audit trail
+            print(f"Audit logging error: {e}. Event: {event_type} - {message}")
 
     def log_model_inference(
         self,

@@ -211,17 +211,25 @@ class AuditTrailManager:
             # Store audit event
             self._store_audit_event(audit_event)
 
-            # Log to medical logger
-            self.logger.log_medical_event(
-                event_type="AUDIT_EVENT",
-                message=f"Audit event logged: {description}",
-                context={
-                    "event_id": audit_event.event_id,
-                    "event_type": event_type.value,
-                    "severity": severity.value,
-                    "user_id": user_id
-                }
-            )
+            # Log to medical logger (with error handling)
+            try:
+                self.logger.log_medical_event(
+                    event_type="AUDIT_EVENT",
+                    message=f"Audit event logged: {description}",
+                    context={
+                        "event_id": audit_event.event_id,
+                        "event_type": event_type.value,
+                        "severity": severity.value,
+                        "user_id": user_id
+                    }
+                )
+            except Exception as log_error:
+                # Don't fail audit trail storage due to logging issues
+                logger.warning(
+                    "Failed to log audit event to medical logger",
+                    error=str(log_error),
+                    event_id=audit_event.event_id
+                )
 
             return audit_event.event_id
 

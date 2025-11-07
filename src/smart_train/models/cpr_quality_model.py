@@ -307,8 +307,30 @@ class CPRQualityAssessmentModel(BaseModel):
 
             return result
 
-        except Exception as e:
+        except (ModelTrainingError, DataProcessingError) as e:
+            # Handle expected model/data errors
             logger.error("CPR quality assessment failed", error=str(e))
+            return ProcessingResult(
+                success=False,
+                message=f"CPR quality assessment failed: {e}",
+                data={}
+            )
+        except Exception as e:
+            # Handle unexpected errors but log audit event separately
+            logger.error("Unexpected error in CPR quality assessment", error=str(e))
+            
+            # Try to log audit event for unexpected errors
+            try:
+                self.audit_manager.log_event(
+                    event_type=AuditEventType.ERROR_EVENT,
+                    description=f"Unexpected CPR model error: {str(e)}",
+                    severity=AuditSeverity.HIGH,
+                    details={"error_type": type(e).__name__, "error_message": str(e)}
+                )
+            except Exception:
+                # Don't let audit logging failure mask the original error
+                pass
+            
             return ProcessingResult(
                 success=False,
                 message=f"CPR quality assessment failed: {e}",

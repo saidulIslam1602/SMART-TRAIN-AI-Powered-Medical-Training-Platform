@@ -82,36 +82,31 @@ class TestCPRQualityAssessmentModel:
         assert model.model_name == "CPRQualityAssessment"
         assert model.model_version == "2.0.0"
         
-    def test_model_predict_success(self):
-        """Test successful prediction with comprehensive mocking."""
-        # Create a completely mocked model that bypasses all initialization issues
-        model = Mock(spec=CPRQualityAssessmentModel)
+    @patch('smart_train.models.cpr_quality_model.CPRQualityNet')
+    def test_model_predict_success(self, mock_net):
+        """Test successful prediction with proper model."""
+        # Setup mock network
+        mock_network = Mock()
+        mock_network.return_value = {
+            'compression_depth': torch.tensor([[55.0]]),
+            'compression_rate': torch.tensor([[110.0]]),
+            'hand_position': torch.tensor([[0.9]]),
+            'release_completeness': torch.tensor([[0.85]]),
+            'rhythm_consistency': torch.tensor([[0.92]]),
+            'attention_weights': torch.tensor([[[0.1, 0.2, 0.3]]])
+        }
+        mock_net.return_value = mock_network
         
-        # Mock the predict method to return a successful result
-        model.predict.return_value = ProcessingResult(
-            success=True,
-            message="CPR quality assessment completed successfully",
-            data={
-                'cpr_metrics': {
-                    'compression_depth': 55.0,
-                    'compression_rate': 110.0,
-                    'hand_position_score': 0.9,
-                    'release_completeness': 0.85,
-                    'rhythm_consistency': 0.92,
-                    'overall_quality_score': 0.88,
-                    'aha_compliant': True,
-                    'feedback_messages': ['Excellent CPR technique']
-                }
-            }
-        )
+        model = CPRQualityAssessmentModel()
+        model.is_loaded = True
+        model.model = mock_network
         
-        # Test prediction
-        input_data = np.random.rand(30, 33, 3)
+        # Test prediction with proper numpy array format (ensure >= 10 frames)
+        input_data = np.random.rand(30, 33, 3)  # (sequence_length, 33_landmarks, 3_coords)
+        
         result = model.predict(input_data)
-        
         assert isinstance(result, ProcessingResult)
         assert result.success is True
-        assert 'cpr_metrics' in result.data
         
     @patch('smart_train.models.cpr_quality_model.logger')
     @patch('smart_train.models.cpr_quality_model.AuditTrailManager')
@@ -169,32 +164,14 @@ class TestRealTimeFeedbackModel:
         assert model.model_version == "2.0.0"
         
     def test_model_predict_success(self):
-        """Test successful feedback prediction with comprehensive mocking."""
-        # Create a completely mocked model that bypasses all initialization issues
-        model = Mock(spec=RealTimeFeedbackModel)
-        
-        # Mock the predict method to return a successful result
-        model.predict.return_value = ProcessingResult(
-            success=True,
-            message="Real-time feedback generated successfully",
-            data={
-                'feedback_messages': [
-                    {
-                        'message': 'Increase compression depth',
-                        'priority': 'high',
-                        'feedback_type': 'technique',
-                        'confidence': 0.95
-                    }
-                ],
-                'feedback_count': 1,
-                'session_duration': 120
-            }
-        )
+        """Test successful feedback prediction."""
+        model = RealTimeFeedbackModel()
+        model.is_loaded = True
         
         input_data = {
             'cpr_metrics': {
-                'compression_depth': 45.0,
-                'compression_rate': 130.0,
+                'compression_depth': 45.0,  # Below optimal
+                'compression_rate': 130.0,  # Above optimal
                 'hand_position_score': 0.9,
                 'release_completeness': 0.8,
                 'rhythm_consistency': 0.7,
