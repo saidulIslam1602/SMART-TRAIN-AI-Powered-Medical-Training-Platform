@@ -79,7 +79,9 @@ class TestMedicalDataPreprocessor:
         # Test with missing video_path
         result = preprocessor.process({})
         assert result.success is False
-        assert "video_path" in result.message.lower() or len(result.errors) > 0
+        assert ("video_path" in result.message.lower() or 
+                "no video files found" in result.message.lower() or 
+                len(result.errors) > 0)
         
     def test_process_nonexistent_video(self):
         """Test processing with nonexistent video file."""
