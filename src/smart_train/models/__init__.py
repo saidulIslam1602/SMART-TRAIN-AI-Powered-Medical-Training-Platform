@@ -10,14 +10,12 @@ This module contains advanced AI models for medical training analysis:
 """
 
 from .cpr_quality_model import CPRQualityAssessmentModel
-from .action_recognition import MedicalActionRecognitionModel
 from .realtime_feedback import RealTimeFeedbackModel
 from .pose_analysis import MedicalPoseAnalysisModel
 from .quality_scoring import MedicalQualityScoringModel
 
 __all__ = [
     "CPRQualityAssessmentModel",
-    "MedicalActionRecognitionModel", 
     "RealTimeFeedbackModel",
     "MedicalPoseAnalysisModel",
     "MedicalQualityScoringModel"

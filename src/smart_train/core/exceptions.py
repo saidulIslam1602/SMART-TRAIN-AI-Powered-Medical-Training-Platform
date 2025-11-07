@@ -207,3 +207,35 @@ class APIError(SmartTrainException):
         
         self.status_code = status_code
         self.endpoint = endpoint
+
+
+class ModelTrainingError(SmartTrainException):
+    """Exception raised when model training fails."""
+    
+    def __init__(self, message: str, model_name: Optional[str] = None, **kwargs):
+        error_code = f"MT_{model_name.upper()}_TRAINING_FAILED" if model_name else "MT_TRAINING_FAILED"
+        context = {"model_name": model_name}
+        context.update(kwargs.get("context", {}))
+        
+        super().__init__(
+            message=message,
+            error_code=error_code,
+            context=context,
+            cause=kwargs.get("cause")
+        )
+
+
+class DataProcessingError(SmartTrainException):
+    """Exception raised when data processing fails."""
+    
+    def __init__(self, message: str, processing_stage: Optional[str] = None, **kwargs):
+        error_code = f"DP_{processing_stage.upper()}_FAILED" if processing_stage else "DP_PROCESSING_FAILED"
+        context = {"processing_stage": processing_stage}
+        context.update(kwargs.get("context", {}))
+        
+        super().__init__(
+            message=message,
+            error_code=error_code,
+            context=context,
+            cause=kwargs.get("cause")
+        )
