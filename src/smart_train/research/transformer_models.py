@@ -124,7 +124,8 @@ class MedicalMultiHeadAttention(nn.Module):
         self.nhead = nhead
         self.head_dim = d_model // nhead
         
-        assert self.head_dim * nhead == d_model, "d_model must be divisible by nhead"
+        if self.head_dim * nhead != d_model:
+            raise ValueError(f"d_model ({d_model}) must be divisible by nhead ({nhead})")
         
         self.q_linear = nn.Linear(d_model, d_model)
         self.k_linear = nn.Linear(d_model, d_model)

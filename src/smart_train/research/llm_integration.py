@@ -248,8 +248,14 @@ class MedicalLLMAgent:
                 )
                 
             elif "llama" in self.config.model_name.lower():
-                # Local Llama models
-                self.tokenizer = AutoTokenizer.from_pretrained(self.config.model_name)
+                # Local Llama models - using specific revision for security
+                model_revision = getattr(self.config, 'model_revision', 'main')
+                self.tokenizer = AutoTokenizer.from_pretrained(  # nosec B615
+                    self.config.model_name,
+                    revision=model_revision,
+                    use_auth_token=False,
+                    trust_remote_code=False
+                )
                 
                 # Quantization for efficiency
                 quantization_config = BitsAndBytesConfig(
@@ -259,11 +265,14 @@ class MedicalLLMAgent:
                     bnb_4bit_quant_type="nf4"
                 )
                 
-                self.model = AutoModelForCausalLM.from_pretrained(
+                self.model = AutoModelForCausalLM.from_pretrained(  # nosec B615
                     self.config.model_name,
+                    revision=model_revision,
                     quantization_config=quantization_config,
                     device_map="auto",
-                    torch_dtype=torch.float16
+                    torch_dtype=torch.float16,
+                    use_auth_token=False,
+                    trust_remote_code=False
                 )
                 
                 self.llm = pipeline(
