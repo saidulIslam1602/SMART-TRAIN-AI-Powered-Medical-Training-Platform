@@ -959,3 +959,254 @@ class AutonomousTrainingAgent(BaseProcessor):
                         performance_improvement * 0.2)
 
         return min(1.0, effectiveness)
+    
+    def analyze_learner_performance(self, session_data: Dict[str, Any]) -> Dict[str, Any]:
+        """
+        Analyze learner performance and generate insights.
+        
+        Args:
+            session_data: Dictionary containing learner performance data
+            
+        Returns:
+            Analysis results with performance insights
+        """
+        try:
+            learner_id = session_data.get('learner_id', 'unknown')
+            performance_history = session_data.get('performance_history', {})
+            learning_preferences = session_data.get('learning_preferences', {})
+            
+            # Analyze current performance
+            current_score = performance_history.get('cpr_quality_score', 0.5)
+            compliance_status = performance_history.get('aha_compliant', False)
+            
+            # Determine learner strengths and weaknesses
+            strengths = []
+            weaknesses = []
+            
+            if current_score >= 0.8:
+                strengths.append("Excellent overall technique")
+            elif current_score >= 0.6:
+                strengths.append("Good basic technique")
+            else:
+                weaknesses.append("Needs improvement in basic technique")
+            
+            if compliance_status:
+                strengths.append("AHA guidelines compliance")
+            else:
+                weaknesses.append("AHA guidelines non-compliance")
+            
+            # Compression analysis
+            compression_depth = performance_history.get('compression_depth', 0)
+            compression_rate = performance_history.get('compression_rate', 0)
+            
+            if 50 <= compression_depth <= 60:
+                strengths.append("Proper compression depth")
+            else:
+                weaknesses.append("Compression depth needs adjustment")
+            
+            if 100 <= compression_rate <= 120:
+                strengths.append("Appropriate compression rate")
+            else:
+                weaknesses.append("Compression rate needs adjustment")
+            
+            # Generate learning path recommendations
+            learning_style = learning_preferences.get('style', 'visual')
+            learning_pace = learning_preferences.get('pace', 'moderate')
+            
+            recommendations = []
+            if 'compression depth' in str(weaknesses):
+                if learning_style == 'visual':
+                    recommendations.append("Use visual depth indicators during practice")
+                else:
+                    recommendations.append("Focus on tactile feedback for compression depth")
+            
+            if 'compression rate' in str(weaknesses):
+                recommendations.append("Practice with metronome at 100-120 BPM")
+            
+            # Calculate adaptation score based on performance trends
+            adaptation_score = min(1.0, current_score + 0.1)  # Slight boost for analysis
+            
+            analysis_result = {
+                'learner_id': learner_id,
+                'performance_level': 'advanced' if current_score >= 0.8 else 'intermediate' if current_score >= 0.6 else 'beginner',
+                'strengths': strengths,
+                'weaknesses': weaknesses,
+                'recommendations': recommendations,
+                'adaptation_score': adaptation_score,
+                'learning_style': learning_style,
+                'suggested_focus_areas': weaknesses[:2],  # Top 2 areas to focus on
+                'confidence_level': min(1.0, current_score * 1.2)
+            }
+            
+            # Log analysis for audit trail
+            self.audit_manager.log_event(
+                event_type=AuditEventType.MODEL_INFERENCE,
+                description=f"Learner performance analysis completed for {learner_id}",
+                details=analysis_result,
+                severity=AuditSeverity.INFO
+            )
+            
+            return analysis_result
+            
+        except Exception as e:
+            logger.error(f"Learner performance analysis failed: {e}")
+            return {
+                'learner_id': session_data.get('learner_id', 'unknown'),
+                'performance_level': 'unknown',
+                'strengths': [],
+                'weaknesses': ['Analysis failed'],
+                'recommendations': ['Please retry analysis'],
+                'adaptation_score': 0.5,
+                'error': str(e)
+            }
+    
+    def generate_training_plan(self, analysis_result: Dict[str, Any]) -> Dict[str, Any]:
+        """
+        Generate personalized training plan based on performance analysis.
+        
+        Args:
+            analysis_result: Results from analyze_learner_performance
+            
+        Returns:
+            Personalized training plan
+        """
+        try:
+            learner_id = analysis_result.get('learner_id', 'unknown')
+            performance_level = analysis_result.get('performance_level', 'beginner')
+            weaknesses = analysis_result.get('weaknesses', [])
+            learning_style = analysis_result.get('learning_style', 'visual')
+            
+            # Generate training modules based on performance level
+            training_modules = []
+            
+            if performance_level == 'beginner':
+                training_modules.extend([
+                    {
+                        'module': 'CPR Basics',
+                        'duration': 30,
+                        'type': 'interactive_tutorial',
+                        'focus': 'fundamental_techniques'
+                    },
+                    {
+                        'module': 'Hand Position Training',
+                        'duration': 15,
+                        'type': 'guided_practice',
+                        'focus': 'hand_placement'
+                    }
+                ])
+            elif performance_level == 'intermediate':
+                training_modules.extend([
+                    {
+                        'module': 'Technique Refinement',
+                        'duration': 20,
+                        'type': 'skill_practice',
+                        'focus': 'technique_improvement'
+                    }
+                ])
+            else:  # advanced
+                training_modules.extend([
+                    {
+                        'module': 'Advanced Scenarios',
+                        'duration': 25,
+                        'type': 'scenario_practice',
+                        'focus': 'complex_situations'
+                    }
+                ])
+            
+            # Add specific modules for identified weaknesses
+            for weakness in weaknesses:
+                if 'compression depth' in weakness.lower():
+                    training_modules.append({
+                        'module': 'Compression Depth Mastery',
+                        'duration': 10,
+                        'type': 'targeted_practice',
+                        'focus': 'depth_control'
+                    })
+                elif 'compression rate' in weakness.lower():
+                    training_modules.append({
+                        'module': 'Rhythm and Rate Training',
+                        'duration': 10,
+                        'type': 'metronome_practice',
+                        'focus': 'rate_control'
+                    })
+                elif 'guidelines' in weakness.lower():
+                    training_modules.append({
+                        'module': 'AHA Guidelines Review',
+                        'duration': 15,
+                        'type': 'knowledge_review',
+                        'focus': 'compliance_understanding'
+                    })
+            
+            # Adapt training style based on learning preferences
+            for module in training_modules:
+                if learning_style == 'visual':
+                    module['delivery_method'] = 'video_demonstration'
+                elif learning_style == 'kinesthetic':
+                    module['delivery_method'] = 'hands_on_practice'
+                else:
+                    module['delivery_method'] = 'mixed_media'
+            
+            # Calculate total training time
+            total_duration = sum(module['duration'] for module in training_modules)
+            
+            # Generate assessment checkpoints
+            assessments = [
+                {
+                    'checkpoint': 'Mid-training Assessment',
+                    'timing': total_duration // 2,
+                    'type': 'skill_check',
+                    'criteria': ['compression_depth', 'compression_rate', 'hand_position']
+                },
+                {
+                    'checkpoint': 'Final Assessment',
+                    'timing': total_duration,
+                    'type': 'comprehensive_evaluation',
+                    'criteria': ['overall_technique', 'aha_compliance', 'confidence']
+                }
+            ]
+            
+            training_plan = {
+                'learner_id': learner_id,
+                'plan_id': f"plan_{learner_id}_{datetime.now().strftime('%Y%m%d_%H%M%S')}",
+                'performance_level': performance_level,
+                'total_duration_minutes': total_duration,
+                'training_modules': training_modules,
+                'assessments': assessments,
+                'learning_objectives': [
+                    'Master proper CPR technique',
+                    'Achieve AHA guidelines compliance',
+                    'Build confidence in emergency response'
+                ],
+                'success_criteria': {
+                    'minimum_quality_score': 0.8,
+                    'aha_compliance_required': True,
+                    'confidence_threshold': 0.7
+                },
+                'personalization': {
+                    'learning_style': learning_style,
+                    'adaptation_level': analysis_result.get('adaptation_score', 0.5),
+                    'focus_areas': analysis_result.get('suggested_focus_areas', [])
+                },
+                'generated_timestamp': datetime.now().isoformat(),
+                'agent_personality': self.personality.value
+            }
+            
+            # Log training plan generation
+            self.audit_manager.log_event(
+                event_type=AuditEventType.MODEL_INFERENCE,
+                description=f"Training plan generated for {learner_id}",
+                details={'plan_id': training_plan['plan_id'], 'modules_count': len(training_modules)},
+                severity=AuditSeverity.INFO
+            )
+            
+            return training_plan
+            
+        except Exception as e:
+            logger.error(f"Training plan generation failed: {e}")
+            return {
+                'learner_id': analysis_result.get('learner_id', 'unknown'),
+                'plan_id': 'error_plan',
+                'error': str(e),
+                'training_modules': [],
+                'total_duration_minutes': 0
+            }

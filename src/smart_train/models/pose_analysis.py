@@ -115,7 +115,7 @@ class MedicalPoseAnalysisModel(BaseModel):
             if pose_landmarks is None:
                 return ProcessingResult(
                     success=False,
-                    error_message="Failed to extract pose landmarks",
+                    message="Failed to extract pose landmarks",
                     data={}
                 )
 
@@ -165,7 +165,7 @@ class MedicalPoseAnalysisModel(BaseModel):
             logger.error("Medical pose analysis failed", error=str(e))
             return ProcessingResult(
                 success=False,
-                error_message=f"Pose analysis failed: {e}",
+                message=f"Pose analysis failed: {e}",
                 data={}
             )
 

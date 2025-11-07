@@ -381,6 +381,25 @@ class RealTimeFeedbackModel(BaseModel):
         if not self.is_loaded:
             self.load_model()
 
+        # Validate input data
+        if not input_data:
+            return ProcessingResult(
+                success=False,
+                message="Feedback generation failed: No input data provided",
+                data={}
+            )
+        
+        # Check for required data sources
+        has_cpr_metrics = 'cpr_metrics' in input_data
+        has_pose_analysis = 'pose_analysis' in input_data
+        
+        if not has_cpr_metrics and not has_pose_analysis:
+            return ProcessingResult(
+                success=False,
+                message="Feedback generation failed: No analysis data (cpr_metrics or pose_analysis) provided",
+                data={}
+            )
+
         try:
             start_time=time.time()
 

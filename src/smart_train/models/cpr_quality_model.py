@@ -327,9 +327,12 @@ class CPRQualityAssessmentModel(BaseModel):
                     severity=AuditSeverity.HIGH,
                     details={"error_type": type(e).__name__, "error_message": str(e)}
                 )
-            except Exception:
+            except Exception as audit_error:
                 # Don't let audit logging failure mask the original error
-                pass
+                logger.warning(
+                    "Failed to log audit event for unexpected error",
+                    audit_error=str(audit_error)
+                )
             
             return ProcessingResult(
                 success=False,

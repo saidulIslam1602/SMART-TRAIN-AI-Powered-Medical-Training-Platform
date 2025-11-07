@@ -30,6 +30,7 @@ class AuditEventType(Enum):
     DATA_ACCESS="data_access"
     DATA_MODIFICATION="data_modification"
     MODEL_INFERENCE="model_inference"
+    MODEL_OPERATION="model_operation"
     SYSTEM_CONFIGURATION="system_configuration"
     COMPLIANCE_CHECK="compliance_check"
     ERROR_EVENT="error_event"
@@ -96,8 +97,29 @@ class AuditEvent:
             "details": self.details
         }
 
+        # Convert numpy types to JSON-serializable types
+        event_data = self._convert_numpy_types(event_data)
         event_str=json.dumps(event_data, sort_keys=True)
         return hashlib.sha256(event_str.encode()).hexdigest()
+    
+    def _convert_numpy_types(self, obj):
+        """Convert numpy types to JSON-serializable Python types."""
+        import numpy as np
+        
+        if isinstance(obj, dict):
+            return {key: self._convert_numpy_types(value) for key, value in obj.items()}
+        elif isinstance(obj, list):
+            return [self._convert_numpy_types(item) for item in obj]
+        elif isinstance(obj, np.bool_):
+            return bool(obj)
+        elif isinstance(obj, np.integer):
+            return int(obj)
+        elif isinstance(obj, np.floating):
+            return float(obj)
+        elif isinstance(obj, np.ndarray):
+            return obj.tolist()
+        else:
+            return obj
 
 
 class AuditTrailManager:
@@ -255,6 +277,9 @@ class AuditTrailManager:
 
         # Convert event to dictionary
         event_dict=audit_event.to_dict()
+        
+        # Convert numpy types to JSON-serializable types
+        event_dict = audit_event._convert_numpy_types(event_dict)
 
         # Append to daily log file
         with open(log_file, 'a') as f:
@@ -286,7 +311,9 @@ class AuditTrailManager:
                 events=[]
 
         # Add new event
-        events.append(audit_event.to_dict())
+        event_dict = audit_event.to_dict()
+        event_dict = audit_event._convert_numpy_types(event_dict)
+        events.append(event_dict)
 
         # Save updated events
         with open(event_type_file, 'w') as f:

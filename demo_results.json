@@ -1,0 +1,21 @@
+{
+  "data_processing": {
+    "input_shape": [
+      100,
+      33,
+      3
+    ],
+    "processed_shape": [
+      100,
+      99
+    ],
+    "feature_count": 13,
+    "validation_passed": true,
+    "processing_time": 0.045
+  },
+  "pose_analysis": {
+    "pose_confidence": 0.95,
+    "cpr_quality_score": 0.39870649576187134,
+    "compression_depth": 30.348104238510132,
+    "compression_rate": 99.36850070953369,
+    "aha_compliant": 
