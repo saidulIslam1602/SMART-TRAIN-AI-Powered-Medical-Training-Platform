@@ -444,7 +444,7 @@ class RealTimeFeedbackModel(BaseModel):
                 event_type=AuditEventType.MODEL_INFERENCE,
                 description=f"Real-time feedback generated: {len(feedback_messages)} messages",
                 severity=AuditSeverity.INFO,
-                metadata={
+                details={
                     'feedback_count': len(feedback_messages),
                     'primary_priority': primary_feedback.priority.value if primary_feedback else None,
                     'processing_time_ms': processing_time * 1000
