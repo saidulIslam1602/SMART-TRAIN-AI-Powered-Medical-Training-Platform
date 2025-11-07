@@ -1,0 +1,302 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: smart-train-api
+  namespace: smart-train
+  labels:
+    app: smart-train-api
+    version: v2.0.0
+    tier: backend
+spec:
+  replicas: 3
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+  selector:
+    matchLabels:
+      app: smart-train-api
+  template:
+    metadata:
+      labels:
+        app: smart-train-api
+        version: v2.0.0
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "8001"
+        prometheus.io/path: "/v2/metrics"
+    spec:
+      containers:
+      - name: smart-train-api
+        image: smarttrain/api:v2.0.0
+        ports:
+        - containerPort: 8001
+          name: http
+        - containerPort: 8002
+          name: metrics
+        env:
+        - name: ENVIRONMENT
+          value: "production"
+        - name: REDIS_URL
+          value: "redis://smart-train-redis:6379"
+        - name: DATABASE_URL
+          valueFrom:
+            secretKeyRef:
+              name: smart-train-secrets
+              key: database-url
+        - name: JWT_SECRET
+          valueFrom:
+            secretKeyRef:
+              name: smart-train-secrets
+              key: jwt-secret
+        - name: AZURE_ML_WORKSPACE_NAME
+          valueFrom:
+            configMapKeyRef:
+              name: smart-train-config
+              key: azure-ml-workspace
+        resources:
+          requests:
+            memory: "512Mi"
+            cpu: "250m"
+          limits:
+            memory: "1Gi"
+            cpu: "500m"
+        livenessProbe:
+          httpGet:
+            path: /v2/health
+            port: 8001
+          initialDelaySeconds: 30
+          periodSeconds: 10
+          timeoutSeconds: 5
+          failureThreshold: 3
+        readinessProbe:
+          httpGet:
+            path: /v2/health
+            port: 8001
+          initialDelaySeconds: 5
+          periodSeconds: 5
+          timeoutSeconds: 3
+          failureThreshold: 2
+        volumeMounts:
+        - name: model-storage
+          mountPath: /app/models
+          readOnly: true
+        - name: config-volume
+          mountPath: /app/config
+          readOnly: true
+      volumes:
+      - name: model-storage
+        persistentVolumeClaim:
+          claimName: smart-train-models-pvc
+      - name: config-volume
+        configMap:
+          name: smart-train-config
+      imagePullSecrets:
+      - name: smart-train-registry-secret
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: smart-train-api-service
+  namespace: smart-train
+  labels:
+    app: smart-train-api
+spec:
+  type: ClusterIP
+  ports:
+  - port: 80
+    targetPort: 8001
+    protocol: TCP
+    name: http
+  - port: 8002
+    targetPort: 8002
+    protocol: TCP
+    name: metrics
+  selector:
+    app: smart-train-api
+
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: smart-train-api-ingress
+  namespace: smart-train
+  annotations:
+    kubernetes.io/ingress.class: "nginx"
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    nginx.ingress.kubernetes.io/rate-limit: "100"
+    nginx.ingress.kubernetes.io/rate-limit-window: "1m"
+    cert-manager.io/cluster-issuer: "letsencrypt-prod"
+spec:
+  tls:
+  - hosts:
+    - api.smart-train.ai
+    secretName: smart-train-tls
+  rules:
+  - host: api.smart-train.ai
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: smart-train-api-service
+            port:
+              number: 80
+
+---
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: smart-train-api-hpa
+  namespace: smart-train
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: smart-train-api
+  minReplicas: 3
+  maxReplicas: 20
+  metrics:
+  - type: Resource
+    resource:
+      name: cpu
+      target:
+        type: Utilization
+        averageUtilization: 70
+  - type: Resource
+    resource:
+      name: memory
+      target:
+        type: Utilization
+        averageUtilization: 80
+  - type: Pods
+    pods:
+      metric:
+        name: requests_per_second
+      target:
+        type: AverageValue
+        averageValue: "100"
+  behavior:
+    scaleUp:
+      stabilizationWindowSeconds: 60
+      policies:
+      - type: Percent
+        value: 100
+        periodSeconds: 15
+    scaleDown:
+      stabilizationWindowSeconds: 300
+      policies:
+      - type: Percent
+        value: 10
+        periodSeconds: 60
+
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: smart-train-config
+  namespace: smart-train
+data:
+  azure-ml-workspace: "smart-train-ml-workspace"
+  redis-url: "redis://smart-train-redis:6379"
+  log-level: "INFO"
+  model-cache-size: "3"
+  max-inference-time-ms: "100"
+  enable-monitoring: "true"
+  enable-ab-testing: "true"
+
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: smart-train-secrets
+  namespace: smart-train
+type: Opaque
+data:
+  database-url: <base64-encoded-database-url>
+  jwt-secret: <base64-encoded-jwt-secret>
+  azure-client-id: <base64-encoded-azure-client-id>
+  azure-client-secret: <base64-encoded-azure-client-secret>
+
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: smart-train-models-pvc
+  namespace: smart-train
+spec:
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
+      storage: 10Gi
+  storageClassName: azure-file
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: smart-train-redis
+  namespace: smart-train
+  labels:
+    app: smart-train-redis
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: smart-train-redis
+  template:
+    metadata:
+      labels:
+        app: smart-train-redis
+    spec:
+      containers:
+      - name: redis
+        image: redis:7-alpine
+        ports:
+        - containerPort: 6379
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "100m"
+          limits:
+            memory: "512Mi"
+            cpu: "200m"
+        volumeMounts:
+        - name: redis-storage
+          mountPath: /data
+      volumes:
+      - name: redis-storage
+        persistentVolumeClaim:
+          claimName: smart-train-redis-pvc
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: smart-train-redis
+  namespace: smart-train
+spec:
+  type: ClusterIP
+  ports:
+  - port: 6379
+    targetPort: 6379
+  selector:
+    app: smart-train-redis
+
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: smart-train-redis-pvc
+  namespace: smart-train
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 5Gi
+  storageClassName: azure-disk
