@@ -161,7 +161,9 @@ class TestISO13485Compliance:
         medical_data = {
             'patient_data': {'anonymized': True, 'consent': True},
             'procedure_data': {'type': 'cpr_training', 'quality_assured': True},
-            'system_data': {'version': '1.0.0', 'validated': True}
+            'system_data': {'version': '1.0.0', 'validated': True},
+            'data_source': 'test_system',
+            'timestamp': '2025-11-07T12:00:00Z'
         }
         
         result = compliance.validate_medical_data(medical_data)
@@ -196,7 +198,7 @@ class TestIEC62304Compliance:
         lifecycle_data = {
             'planning': {'documented': True, 'reviewed': True},
             'requirements': {'specified': True, 'traced': True},
-            'architecture': {'designed': True, 'validated': True},
+            'design': {'designed': True, 'validated': True},
             'implementation': {'coded': True, 'tested': True},
             'testing': {'unit_tests': True, 'integration_tests': True},
             'release': {'approved': True, 'documented': True}
