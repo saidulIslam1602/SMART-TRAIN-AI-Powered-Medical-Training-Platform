@@ -31,7 +31,7 @@ from .core.logging import get_logger
 
 __all__ = [
     "SmartTrainException",
-    "SmartTrainConfig", 
+    "SmartTrainConfig",
     "get_logger",
     "__version__",
     "__medical_standards__",
