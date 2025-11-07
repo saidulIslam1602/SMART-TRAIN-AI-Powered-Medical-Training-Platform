@@ -298,7 +298,7 @@ class CPRQualityAssessmentModel(BaseModel):
                 event_type=AuditEventType.MODEL_INFERENCE,
                 description=f"CPR quality assessment completed",
                 severity=AuditSeverity.INFO,
-                metadata={
+                details={
                     'quality_score': cpr_metrics.overall_quality_score,
                     'aha_compliant': cpr_metrics.aha_compliant,
                     'inference_time_ms': inference_time * 1000
