@@ -84,7 +84,7 @@ class DataProcessingConfig:
 @dataclass
 class APIConfig:
     """API configuration settings."""
-    host: str = "0.0.0.0"
+    host: str = "127.0.0.1"  # Use localhost by default for security
     port: int = 8000
     debug: bool = False
     cors_enabled: bool = True

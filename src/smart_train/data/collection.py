@@ -456,7 +456,7 @@ class RealDatasetCollector(BaseProcessor):
                 
                 logger.info(f"Downloading {url}")
                 
-                response = requests.get(url, stream=True)
+                response = requests.get(url, stream=True, timeout=30)
                 response.raise_for_status()
                 
                 total_size = int(response.headers.get('content-length', 0))
@@ -484,7 +484,7 @@ class RealDatasetCollector(BaseProcessor):
                 filename = Path(url).name
                 destination = dataset_dir / filename
                 
-                response = requests.get(url)
+                response = requests.get(url, timeout=30)
                 response.raise_for_status()
                 
                 with open(destination, 'wb') as f:
@@ -861,7 +861,8 @@ Replace this sample data with real datasets for production use.
                         for pattern in phi_patterns:
                             if pattern in content:
                                 result.add_error(f"Potential PHI detected in {text_file}")
-                except Exception:
+                except Exception as e:
+                    self.logger.debug(f"Skipping file {text_file}: {e}")
                     continue  # Skip files that can't be read as text
             
             # Log compliance check
@@ -926,7 +927,7 @@ Replace this sample data with real datasets for production use.
     def _calculate_directory_checksum(self, directory: Path) -> str:
         """Calculate checksum for directory contents."""
         try:
-            hash_md5 = hashlib.md5()
+            hash_md5 = hashlib.md5(usedforsecurity=False)  # Used for file integrity, not security
             
             # Sort files for consistent checksum
             files = sorted(directory.rglob('*'))
@@ -1057,7 +1058,7 @@ class MedicalDatasetManager:
     def _calculate_directory_checksum(self, directory: Path) -> str:
         """Calculate checksum for directory contents."""
         try:
-            hash_md5 = hashlib.md5()
+            hash_md5 = hashlib.md5(usedforsecurity=False)  # Used for file integrity, not security
             files = sorted(directory.rglob('*'))
             
             for file_path in files:
