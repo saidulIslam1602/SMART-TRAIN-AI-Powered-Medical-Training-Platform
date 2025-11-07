@@ -82,9 +82,13 @@ class TestCPRQualityAssessmentModel:
         assert model.model_name == "CPRQualityAssessment"
         assert model.model_version == "2.0.0"
         
+    @patch('smart_train.models.cpr_quality_model.AuditTrailManager')
     @patch('smart_train.models.cpr_quality_model.CPRQualityNet')
-    def test_model_predict_success(self, mock_net):
+    def test_model_predict_success(self, mock_net, mock_audit):
         """Test successful prediction."""
+        # Mock audit manager to avoid logging issues
+        mock_audit.return_value.log_event = Mock()
+        
         # Setup mock network
         mock_network = Mock()
         mock_network.return_value = {
@@ -108,9 +112,13 @@ class TestCPRQualityAssessmentModel:
         assert isinstance(result, ProcessingResult)
         assert result.success is True
         
+    @patch('smart_train.models.cpr_quality_model.AuditTrailManager')
     @patch('smart_train.models.cpr_quality_model.CPRQualityNet')
-    def test_model_predict_invalid_input(self, mock_net):
+    def test_model_predict_invalid_input(self, mock_net, mock_audit):
         """Test prediction with invalid input."""
+        # Mock audit manager to avoid logging issues
+        mock_audit.return_value.log_event = Mock()
+        
         mock_net.return_value = Mock()
         model = CPRQualityAssessmentModel()
         model.is_loaded = True
@@ -196,9 +204,13 @@ class TestRealTimeFeedbackModel:
 class TestModelIntegration:
     """Test model integration scenarios."""
     
+    @patch('smart_train.models.cpr_quality_model.AuditTrailManager')
     @patch('smart_train.models.cpr_quality_model.CPRQualityNet')
-    def test_cpr_to_feedback_pipeline(self, mock_net):
+    def test_cpr_to_feedback_pipeline(self, mock_net, mock_audit):
         """Test CPR assessment to feedback pipeline."""
+        # Mock audit manager to avoid logging issues
+        mock_audit.return_value.log_event = Mock()
+        
         # Setup CPR model
         mock_network = Mock()
         mock_network.return_value = {
