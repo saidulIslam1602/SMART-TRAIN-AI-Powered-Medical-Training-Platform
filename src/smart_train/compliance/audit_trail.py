@@ -38,6 +38,7 @@ class AuditEventType(Enum):
 
 class AuditSeverity(Enum):
     """Severity levels for audit events."""
+    INFO="info"
     LOW="low"
     MEDIUM="medium"
     HIGH="high"
