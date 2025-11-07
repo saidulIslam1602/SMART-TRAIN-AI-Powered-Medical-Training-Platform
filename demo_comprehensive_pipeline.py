@@ -549,8 +549,29 @@ class SmartTrainPipelineDemo:
         # Save results to file
         results_file = Path("demo_results.json")
         with open(results_file, 'w') as f:
-            json.dump(self.results, f, indent=2)
+            # Convert numpy types to JSON-serializable types
+            serializable_results = self._convert_numpy_types(self.results)
+            json.dump(serializable_results, f, indent=2)
         print_success(f"Results saved to: {results_file}")
+    
+    def _convert_numpy_types(self, obj):
+        """Convert numpy types to JSON-serializable Python types."""
+        import numpy as np
+        
+        if isinstance(obj, dict):
+            return {key: self._convert_numpy_types(value) for key, value in obj.items()}
+        elif isinstance(obj, list):
+            return [self._convert_numpy_types(item) for item in obj]
+        elif isinstance(obj, np.bool_):
+            return bool(obj)
+        elif isinstance(obj, np.integer):
+            return int(obj)
+        elif isinstance(obj, np.floating):
+            return float(obj)
+        elif isinstance(obj, np.ndarray):
+            return obj.tolist()
+        else:
+            return obj
 
 async def main():
     """Main demonstration function."""
