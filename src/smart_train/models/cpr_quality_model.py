@@ -299,9 +299,9 @@ class CPRQualityAssessmentModel(BaseModel):
                 description=f"CPR quality assessment completed",
                 severity=AuditSeverity.INFO,
                 details={
-                    'quality_score': cpr_metrics.overall_quality_score,
-                    'aha_compliant': cpr_metrics.aha_compliant,
-                    'inference_time_ms': inference_time * 1000
+                    'quality_score': float(cpr_metrics.overall_quality_score),
+                    'aha_compliant': bool(cpr_metrics.aha_compliant),
+                    'inference_time_ms': float(inference_time * 1000)
                 }
             )
 
