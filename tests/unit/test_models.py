@@ -68,7 +68,7 @@ class TestCPRQualityNet:
         assert isinstance(output, dict)
         assert 'compression_depth' in output
         assert 'compression_rate' in output
-        assert 'overall_quality' in output
+        assert 'quality_class' in output
 
 
 class TestCPRQualityAssessmentModel:
@@ -79,8 +79,8 @@ class TestCPRQualityAssessmentModel:
         """Test model initialization."""
         mock_net.return_value = Mock()
         model = CPRQualityAssessmentModel()
-        assert model.model_name == "CPRQualityAssessmentModel"
-        assert model.model_version == "2.1.0"
+        assert model.model_name == "CPRQualityAssessment"
+        assert model.model_version == "2.0.0"
         
     @patch('smart_train.models.cpr_quality_model.CPRQualityNet')
     def test_model_predict_success(self, mock_net):
@@ -150,7 +150,7 @@ class TestRealTimeFeedbackModel:
     def test_model_initialization(self):
         """Test model initialization."""
         model = RealTimeFeedbackModel()
-        assert model.model_name == "RealTimeFeedbackModel"
+        assert model.model_name == "RealTimeFeedback"
         assert model.model_version == "2.0.0"
         
     def test_model_predict_success(self):

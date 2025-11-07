@@ -4,11 +4,16 @@ import pytest
 import sys
 import numpy as np
 import tempfile
+import os
 from pathlib import Path
 from unittest.mock import Mock, patch, MagicMock
 
 # Add src to path
 sys.path.insert(0, str(Path(__file__).parent.parent.parent / "src"))
+
+# Set up test environment variables
+os.environ['SMART_TRAIN_JWT_SECRET'] = 'test-jwt-secret-key-for-testing'
+os.environ['ENVIRONMENT'] = 'testing'
 
 from smart_train.data.preprocessing import MedicalDataPreprocessor
 from smart_train.data.collection import RealDatasetCollector, DatasetMetadata

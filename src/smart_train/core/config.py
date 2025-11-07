@@ -344,6 +344,36 @@ class SmartTrainConfig:
 
         return config_dict
 
+    @classmethod
+    def from_dict(cls, config_dict: Dict[str, Any]) -> 'SmartTrainConfig':
+        """
+        Create configuration from dictionary.
+        
+        Args:
+            config_dict: Configuration dictionary
+            
+        Returns:
+            SmartTrainConfig instance
+        """
+        # Create a temporary config instance
+        config = cls.__new__(cls)
+        config.config_path = None
+        config._config_data = config_dict.copy()
+        
+        # Initialize configuration sections
+        config.database = DatabaseConfig()
+        config.azure = AzureConfig()
+        config.model = ModelConfig()
+        config.medical_compliance = MedicalComplianceConfig()
+        config.data_processing = DataProcessingConfig()
+        config.api = APIConfig()
+        config.logging = LoggingConfig()
+        
+        # Apply configuration
+        config._apply_configuration()
+        
+        return config
+
 
 # Global configuration instance
 _config_instance: Optional[SmartTrainConfig] = None

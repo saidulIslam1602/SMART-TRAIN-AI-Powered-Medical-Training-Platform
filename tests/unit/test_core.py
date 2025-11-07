@@ -10,6 +10,10 @@ import os
 # Add src to path
 sys.path.insert(0, str(Path(__file__).parent.parent.parent / "src"))
 
+# Set up test environment variables
+os.environ['SMART_TRAIN_JWT_SECRET'] = 'test-jwt-secret-key-for-testing'
+os.environ['ENVIRONMENT'] = 'testing'
+
 from smart_train.core.config import SmartTrainConfig, get_config
 from smart_train.core.logging import get_logger, setup_logging
 from smart_train.core.exceptions import (
@@ -107,12 +111,12 @@ class TestBaseProcessor:
             success=True,
             message="Processing completed",
             data={'key': 'value'},
-            processing_time=1.5
+            processing_time_ms=1500.0
         )
         assert result.success is True
         assert result.message == "Processing completed"
         assert result.data == {'key': 'value'}
-        assert result.processing_time == 1.5
+        assert result.processing_time_ms == 1500.0
         
     def test_processing_result_to_dict(self):
         """Test ProcessingResult to_dict method."""
@@ -131,7 +135,11 @@ class TestBaseProcessor:
 class MockProcessor(BaseProcessor):
     """Mock processor for testing."""
     
-    def process(self, input_data):
+    def __init__(self):
+        """Initialize mock processor."""
+        super().__init__(processor_name="MockProcessor", processor_version="1.0.0")
+    
+    def process(self, input_data, **kwargs):
         """Mock process method."""
         return ProcessingResult(
             success=True,

@@ -69,3 +69,46 @@ class ISO13485Compliance:
         }
 
         return result
+
+    def validate_medical_data(self, medical_data: Dict[str, Any]) -> ProcessingResult:
+        """
+        Validate medical data for ISO 13485 compliance.
+        
+        Args:
+            medical_data: Medical data to validate
+            
+        Returns:
+            ProcessingResult with validation results
+        """
+        result = ProcessingResult(
+            success=True,
+            message="Medical data validation completed"
+        )
+        
+        # Check required fields
+        required_fields = ['patient_data', 'data_source', 'timestamp']
+        missing_fields = []
+        
+        for field in required_fields:
+            if field not in medical_data:
+                missing_fields.append(field)
+        
+        # Check patient data compliance
+        if 'patient_data' in medical_data:
+            patient_data = medical_data['patient_data']
+            if not patient_data.get('anonymized', False):
+                if not patient_data.get('consent_obtained', False):
+                    missing_fields.append('patient_consent')
+        
+        if missing_fields:
+            result.success = False
+            result.message = f"Medical data validation failed: missing {missing_fields}"
+            result.add_error(f"Missing required fields: {missing_fields}")
+        else:
+            result.data = {
+                "validation_status": "compliant",
+                "checked_fields": required_fields,
+                "compliance_level": "ISO_13485"
+            }
+        
+        return result

@@ -27,3 +27,47 @@ class IEC62304Compliance:
         }
 
         return result
+
+    def validate_software_lifecycle(self, lifecycle_data: Dict[str, Any]) -> ProcessingResult:
+        """
+        Validate software lifecycle for IEC 62304 compliance.
+        
+        Args:
+            lifecycle_data: Software lifecycle data to validate
+            
+        Returns:
+            ProcessingResult with validation results
+        """
+        result = ProcessingResult(
+            success=True,
+            message="Software lifecycle validation completed"
+        )
+        
+        # Check required lifecycle phases
+        required_phases = ['planning', 'requirements', 'design', 'implementation', 'testing', 'release']
+        missing_phases = []
+        
+        for phase in required_phases:
+            if phase not in lifecycle_data:
+                missing_phases.append(phase)
+            else:
+                phase_data = lifecycle_data[phase]
+                # Check if phase has required completion indicators
+                if not isinstance(phase_data, dict):
+                    missing_phases.append(f"{phase}_data")
+                elif not any(phase_data.values()):  # Check if any completion flag is True
+                    missing_phases.append(f"{phase}_completion")
+        
+        if missing_phases:
+            result.success = False
+            result.message = f"Software lifecycle validation failed: missing {missing_phases}"
+            result.add_error(f"Missing or incomplete phases: {missing_phases}")
+        else:
+            result.data = {
+                "validation_status": "compliant",
+                "lifecycle_phases_checked": required_phases,
+                "compliance_standard": "IEC_62304",
+                "software_safety_class": "B"
+            }
+        
+        return result

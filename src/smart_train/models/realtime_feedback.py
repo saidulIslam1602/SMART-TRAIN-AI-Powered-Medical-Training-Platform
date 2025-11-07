@@ -183,7 +183,7 @@ class FeedbackEngine:
                 message=self.feedback_templates['cpr_compression_depth']['too_shallow'],
                 priority=FeedbackPriority.HIGH,
                 feedback_type=FeedbackType.TECHNIQUE,
-                _timestamp=timestamp,
+                timestamp=timestamp,
                 confidence=0.9,
                 action_required=True,
                 medical_context="AHA Guidelines: 2-2.4 inches compression depth",
@@ -194,7 +194,7 @@ class FeedbackEngine:
                 message=self.feedback_templates['cpr_compression_depth']['too_deep'],
                 priority=FeedbackPriority.MEDIUM,
                 feedback_type=FeedbackType.SAFETY,
-                _timestamp=timestamp,
+                timestamp=timestamp,
                 confidence=0.85,
                 action_required=True,
                 medical_context="Risk of rib fracture with excessive depth"
@@ -204,7 +204,7 @@ class FeedbackEngine:
                 message=self.feedback_templates['cpr_compression_depth']['optimal'],
                 priority=FeedbackPriority.POSITIVE,
                 feedback_type=FeedbackType.ENCOURAGEMENT,
-                _timestamp=timestamp,
+                timestamp=timestamp,
                 confidence=0.95,
                 action_required=False
             ))
@@ -216,7 +216,7 @@ class FeedbackEngine:
                 message=self.feedback_templates['cpr_compression_rate']['too_slow'],
                 priority=FeedbackPriority.HIGH,
                 feedback_type=FeedbackType.TECHNIQUE,
-                _timestamp=timestamp,
+                timestamp=timestamp,
                 confidence=0.9,
                 action_required=True,
                 improvement_suggestion="Count aloud: 1-and-2-and-3..."
@@ -226,7 +226,7 @@ class FeedbackEngine:
                 message=self.feedback_templates['cpr_compression_rate']['too_fast'],
                 priority=FeedbackPriority.MEDIUM,
                 feedback_type=FeedbackType.TECHNIQUE,
-                _timestamp=timestamp,
+                timestamp=timestamp,
                 confidence=0.85,
                 action_required=True,
                 improvement_suggestion="Focus on complete compressions rather than speed"
@@ -239,7 +239,7 @@ class FeedbackEngine:
                 message=self.feedback_templates['cpr_hand_position']['incorrect'],
                 priority=FeedbackPriority.HIGH,
                 feedback_type=FeedbackType.TECHNIQUE,
-                _timestamp=timestamp,
+                timestamp=timestamp,
                 confidence=0.8,
                 action_required=True,
                 medical_context="Proper hand position ensures effective compressions"
@@ -252,7 +252,7 @@ class FeedbackEngine:
                 message=self.feedback_templates['cpr_release']['incomplete'],
                 priority=FeedbackPriority.MEDIUM,
                 feedback_type=FeedbackType.TECHNIQUE,
-                _timestamp=timestamp,
+                timestamp=timestamp,
                 confidence=0.85,
                 action_required=True,
                 improvement_suggestion="Lift hands slightly between compressions"
@@ -272,7 +272,7 @@ class FeedbackEngine:
                     message="Improve body alignment - keep shoulders over hands",
                     priority=FeedbackPriority.MEDIUM,
                     feedback_type=FeedbackType.TECHNIQUE,
-                    _timestamp=timestamp,
+                    timestamp=timestamp,
                     confidence=0.8,
                     action_required=True,
                     improvement_suggestion="Position yourself directly over the patient"
@@ -286,7 +286,7 @@ class FeedbackEngine:
                     message="Keep arms straight and locked during compressions",
                     priority=FeedbackPriority.MEDIUM,
                     feedback_type=FeedbackType.TECHNIQUE,
-                    _timestamp=timestamp,
+                    timestamp=timestamp,
                     confidence=0.85,
                     action_required=True,
                     improvement_suggestion="Use your body weight, not arm muscles"
@@ -311,7 +311,7 @@ class FeedbackEngine:
                     message="Great improvement! Your technique is getting better",
                     priority=FeedbackPriority.POSITIVE,
                     feedback_type=FeedbackType.ENCOURAGEMENT,
-                    _timestamp=timestamp,
+                    timestamp=timestamp,
                     confidence=0.9,
                     action_required=False
                 ))
@@ -320,7 +320,7 @@ class FeedbackEngine:
                     message="Focus on maintaining technique - take a brief rest if needed",
                     priority=FeedbackPriority.MEDIUM,
                     feedback_type=FeedbackType.PERFORMANCE,
-                    _timestamp=timestamp,
+                    timestamp=timestamp,
                     confidence=0.8,
                     action_required=False,
                     improvement_suggestion="Fatigue may be affecting performance"
@@ -427,13 +427,11 @@ class RealTimeFeedbackModel(BaseModel):
             # Create result
             result=ProcessingResult(
                 success=True,
+                message="Real-time feedback generated successfully",
                 data={
                     'feedback_result': feedback_result.__dict__,
                     'feedback_messages': [msg.__dict__ for msg in feedback_messages],
-                    'processing_time_ms': processing_time * 1000,
-                    'model_version': self.model_version
-                },
-                metadata={
+                    'model_version': self.model_version,
                     'model_id': self.model_id,
                     'feedback_count': len(feedback_messages),
                     'session_duration': time.time() - self.session_data['start_time'],
@@ -459,7 +457,7 @@ class RealTimeFeedbackModel(BaseModel):
             logger.error("Real-time feedback generation failed", error=str(e))
             return ProcessingResult(
                 success=False,
-                error_message=f"Feedback generation failed: {e}",
+                message=f"Feedback generation failed: {e}",
                 data={}
             )
 
