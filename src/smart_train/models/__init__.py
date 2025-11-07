@@ -3,7 +3,7 @@ AI Models module for SMART-TRAIN platform.
 
 This module contains advanced AI models for medical training analysis:
 - CPR Quality Assessment Model
-- Action Recognition Model  
+- Action Recognition Model
 - Real-time Feedback Generation
 - Medical Procedure Classification
 - Performance Scoring Models

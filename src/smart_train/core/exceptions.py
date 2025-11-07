@@ -13,21 +13,21 @@ from datetime import datetime
 class SmartTrainException(Exception):
     """
     Base exception class for all SMART-TRAIN related errors.
-    
+
     This exception provides enhanced error tracking capabilities
     required for medical device compliance and audit trails.
     """
-    
+
     def __init__(
-        self, 
-        message: str, 
+        self,
+        message: str,
         error_code: Optional[str] = None,
         context: Optional[Dict[str, Any]] = None,
         cause: Optional[Exception] = None
     ):
         """
         Initialize SmartTrainException.
-        
+
         Args:
             message: Human-readable error message
             error_code: Unique error code for tracking
@@ -41,7 +41,7 @@ class SmartTrainException(Exception):
         self.cause = cause
         self.timestamp = datetime.utcnow()
         self.traceback_str = traceback.format_exc()
-        
+
     def to_dict(self) -> Dict[str, Any]:
         """Convert exception to dictionary for logging and audit trails."""
         return {
@@ -58,14 +58,14 @@ class SmartTrainException(Exception):
 class MedicalComplianceError(SmartTrainException):
     """
     Exception raised when medical compliance requirements are violated.
-    
+
     This exception is used for ISO 13485, IEC 62304, and other medical
     device standard violations that require immediate attention.
     """
-    
+
     def __init__(
-        self, 
-        message: str, 
+        self,
+        message: str,
         compliance_standard: str,
         violation_type: str,
         severity: str = "HIGH",
@@ -73,7 +73,7 @@ class MedicalComplianceError(SmartTrainException):
     ):
         """
         Initialize MedicalComplianceError.
-        
+
         Args:
             message: Description of compliance violation
             compliance_standard: Which standard was violated (e.g., "ISO 13485")
@@ -87,14 +87,14 @@ class MedicalComplianceError(SmartTrainException):
             "severity": severity
         }
         context.update(kwargs.get("context", {}))
-        
+
         super().__init__(
             message=message,
             error_code=error_code,
             context=context,
             cause=kwargs.get("cause")
         )
-        
+
         self.compliance_standard = compliance_standard
         self.violation_type = violation_type
         self.severity = severity
@@ -103,14 +103,14 @@ class MedicalComplianceError(SmartTrainException):
 class DataValidationError(SmartTrainException):
     """
     Exception raised when data validation fails.
-    
+
     This exception is used for medical data validation failures,
     including pose estimation errors, video quality issues, etc.
     """
-    
+
     def __init__(
-        self, 
-        message: str, 
+        self,
+        message: str,
         validation_type: str,
         field_name: Optional[str] = None,
         expected_value: Optional[Any] = None,
@@ -119,7 +119,7 @@ class DataValidationError(SmartTrainException):
     ):
         """
         Initialize DataValidationError.
-        
+
         Args:
             message: Description of validation failure
             validation_type: Type of validation that failed
@@ -135,14 +135,14 @@ class DataValidationError(SmartTrainException):
             "actual_value": actual_value
         }
         context.update(kwargs.get("context", {}))
-        
+
         super().__init__(
             message=message,
             error_code=error_code,
             context=context,
             cause=kwargs.get("cause")
         )
-        
+
         self.validation_type = validation_type
         self.field_name = field_name
         self.expected_value = expected_value
@@ -151,12 +151,12 @@ class DataValidationError(SmartTrainException):
 
 class ModelInferenceError(SmartTrainException):
     """Exception raised when AI model inference fails."""
-    
+
     def __init__(self, message: str, model_name: str, **kwargs):
         error_code = f"MI_{model_name.upper()}_INFERENCE_FAILED"
         context = {"model_name": model_name}
         context.update(kwargs.get("context", {}))
-        
+
         super().__init__(
             message=message,
             error_code=error_code,
@@ -167,12 +167,12 @@ class ModelInferenceError(SmartTrainException):
 
 class ConfigurationError(SmartTrainException):
     """Exception raised when configuration is invalid or missing."""
-    
+
     def __init__(self, message: str, config_key: Optional[str] = None, **kwargs):
         error_code = "CF_CONFIGURATION_ERROR"
         context = {"config_key": config_key}
         context.update(kwargs.get("context", {}))
-        
+
         super().__init__(
             message=message,
             error_code=error_code,
@@ -183,10 +183,10 @@ class ConfigurationError(SmartTrainException):
 
 class APIError(SmartTrainException):
     """Exception raised for API-related errors."""
-    
+
     def __init__(
-        self, 
-        message: str, 
+        self,
+        message: str,
         status_code: int = 500,
         endpoint: Optional[str] = None,
         **kwargs
@@ -197,26 +197,26 @@ class APIError(SmartTrainException):
             "endpoint": endpoint
         }
         context.update(kwargs.get("context", {}))
-        
+
         super().__init__(
             message=message,
             error_code=error_code,
             context=context,
             cause=kwargs.get("cause")
         )
-        
+
         self.status_code = status_code
         self.endpoint = endpoint
 
 
 class ModelTrainingError(SmartTrainException):
     """Exception raised when model training fails."""
-    
+
     def __init__(self, message: str, model_name: Optional[str] = None, **kwargs):
         error_code = f"MT_{model_name.upper()}_TRAINING_FAILED" if model_name else "MT_TRAINING_FAILED"
         context = {"model_name": model_name}
         context.update(kwargs.get("context", {}))
-        
+
         super().__init__(
             message=message,
             error_code=error_code,
@@ -227,12 +227,12 @@ class ModelTrainingError(SmartTrainException):
 
 class DataProcessingError(SmartTrainException):
     """Exception raised when data processing fails."""
-    
+
     def __init__(self, message: str, processing_stage: Optional[str] = None, **kwargs):
         error_code = f"DP_{processing_stage.upper()}_FAILED" if processing_stage else "DP_PROCESSING_FAILED"
         context = {"processing_stage": processing_stage}
         context.update(kwargs.get("context", {}))
-        
+
         super().__init__(
             message=message,
             error_code=error_code,

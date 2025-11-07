@@ -73,12 +73,12 @@ class LearnerProfile:
     learning_goals: List[str]
     cultural_background: Optional[str]
     language_preference: str
-    
+
     # Performance history
     session_history: List[Dict[str, Any]]
     skill_progression: Dict[str, float]
     engagement_metrics: Dict[str, float]
-    
+
     # Adaptive parameters
     optimal_difficulty_level: float
     attention_span_minutes: int
@@ -104,14 +104,14 @@ class TrainingSession:
 
 class PedagogicalStrategy:
     """Pedagogical strategy for autonomous teaching."""
-    
+
     def __init__(self, strategy_name: str):
         self.strategy_name = strategy_name
         self.effectiveness_history = []
         self.adaptation_rules = {}
         self.success_rate = 0.0
-    
-    def apply_strategy(self, learner_profile: LearnerProfile, 
+
+    def apply_strategy(self, learner_profile: LearnerProfile,
                       current_performance: Dict[str, float]) -> Dict[str, Any]:
         """Apply pedagogical strategy based on learner profile."""
         strategy_config = {
@@ -121,9 +121,9 @@ class PedagogicalStrategy:
             "practice_exercises": self._generate_practice_exercises(learner_profile),
             "motivation_techniques": self._select_motivation_techniques(learner_profile)
         }
-        
+
         return strategy_config
-    
+
     def _select_instruction_method(self, learner_profile: LearnerProfile) -> str:
         """Select optimal instruction method based on learning style."""
         method_mapping = {
@@ -133,20 +133,20 @@ class PedagogicalStrategy:
             LearningStyle.READING_WRITING: "text_based_instruction",
             LearningStyle.MULTIMODAL: "integrated_approach"
         }
-        
+
         return method_mapping.get(learner_profile.learning_style, "adaptive_mixed")
-    
+
     def _calculate_difficulty_adjustment(self, performance: Dict[str, float]) -> float:
         """Calculate optimal difficulty adjustment."""
         avg_performance = np.mean(list(performance.values()))
-        
+
         if avg_performance > 0.9:
             return 0.1  # Increase difficulty
         elif avg_performance < 0.6:
             return -0.2  # Decrease difficulty
         else:
             return 0.0  # Maintain current level
-    
+
     def _determine_feedback_timing(self, learner_profile: LearnerProfile) -> str:
         """Determine optimal feedback timing."""
         if learner_profile.feedback_frequency_preference == "immediate":
@@ -155,11 +155,11 @@ class PedagogicalStrategy:
             return "end_of_session"
         else:
             return "adaptive"
-    
+
     def _generate_practice_exercises(self, learner_profile: LearnerProfile) -> List[str]:
         """Generate personalized practice exercises."""
         exercises = []
-        
+
         for area in learner_profile.improvement_areas:
             if area == "compression_depth":
                 exercises.append("depth_focused_cpr_practice")
@@ -167,13 +167,13 @@ class PedagogicalStrategy:
                 exercises.append("rhythm_training_exercise")
             elif area == "hand_position":
                 exercises.append("positioning_accuracy_drill")
-        
+
         return exercises
-    
+
     def _select_motivation_techniques(self, learner_profile: LearnerProfile) -> List[str]:
         """Select motivation techniques based on learner profile."""
         techniques = []
-        
+
         for trigger in learner_profile.motivation_triggers:
             if trigger == "achievement":
                 techniques.append("progress_badges")
@@ -181,26 +181,26 @@ class PedagogicalStrategy:
                 techniques.append("leaderboard_comparison")
             elif trigger == "mastery":
                 techniques.append("skill_progression_tracking")
-        
+
         return techniques
 
 
 class AutonomousDecisionEngine:
     """
     Autonomous decision-making engine for training agents.
-    
+
     This engine makes intelligent decisions about:
     - When to intervene during training
     - How to adapt teaching strategies
     - What feedback to provide
     - How to personalize the experience
     """
-    
+
     def __init__(self):
         self.decision_history = []
         self.decision_effectiveness = {}
         self.learning_algorithms = self._initialize_learning_algorithms()
-    
+
     def _initialize_learning_algorithms(self) -> Dict[str, Any]:
         """Initialize machine learning algorithms for decision making."""
         return {
@@ -209,7 +209,7 @@ class AutonomousDecisionEngine:
             "engagement_monitor": self._create_engagement_model(),
             "performance_predictor": self._create_performance_model()
         }
-    
+
     def _create_intervention_model(self) -> nn.Module:
         """Create model to predict when intervention is needed."""
         return nn.Sequential(
@@ -220,7 +220,7 @@ class AutonomousDecisionEngine:
             nn.Linear(32, 1),
             nn.Sigmoid()  # Probability of intervention needed
         )
-    
+
     def _create_strategy_model(self) -> nn.Module:
         """Create model to select optimal teaching strategy."""
         return nn.Sequential(
@@ -231,7 +231,7 @@ class AutonomousDecisionEngine:
             nn.Linear(64, 10),  # 10 different strategies
             nn.Softmax(dim=-1)
         )
-    
+
     def _create_engagement_model(self) -> nn.Module:
         """Create model to monitor learner engagement."""
         return nn.Sequential(
@@ -242,7 +242,7 @@ class AutonomousDecisionEngine:
             nn.Linear(16, 1),
             nn.Sigmoid()  # Engagement score [0, 1]
         )
-    
+
     def _create_performance_model(self) -> nn.Module:
         """Create model to predict future performance."""
         return nn.Sequential(
@@ -252,21 +252,21 @@ class AutonomousDecisionEngine:
             nn.ReLU(),
             nn.Linear(32, 6)  # 6 performance metrics
         )
-    
-    def should_intervene(self, learner_state: Dict[str, float], 
+
+    def should_intervene(self, learner_state: Dict[str, float],
                         session_context: Dict[str, Any]) -> Tuple[bool, str]:
         """Decide if agent should intervene in current training."""
         # Extract features for intervention prediction
         features = self._extract_intervention_features(learner_state, session_context)
-        
+
         # Predict intervention probability
         intervention_prob = self.learning_algorithms["intervention_predictor"](
             torch.FloatTensor(features)
         ).item()
-        
+
         # Decision logic
         should_intervene = intervention_prob > 0.7
-        
+
         # Determine intervention type
         if should_intervene:
             if learner_state.get("performance_decline", 0) > 0.3:
@@ -279,7 +279,7 @@ class AutonomousDecisionEngine:
                 intervention_type = "general_guidance"
         else:
             intervention_type = "continue_monitoring"
-        
+
         # Record decision for learning
         self.decision_history.append({
             "timestamp": time.time(),
@@ -288,59 +288,59 @@ class AutonomousDecisionEngine:
             "decision": should_intervene,
             "intervention_type": intervention_type
         })
-        
+
         return should_intervene, intervention_type
-    
+
     def select_teaching_strategy(self, learner_profile: LearnerProfile,
                                current_context: Dict[str, Any]) -> str:
         """Select optimal teaching strategy for current situation."""
         # Extract features for strategy selection
         features = self._extract_strategy_features(learner_profile, current_context)
-        
+
         # Predict strategy probabilities
         strategy_probs = self.learning_algorithms["strategy_selector"](
             torch.FloatTensor(features)
         )
-        
+
         # Strategy mapping
         strategies = [
             "direct_instruction", "guided_discovery", "collaborative_learning",
             "problem_based", "simulation_based", "adaptive_feedback",
             "peer_learning", "self_directed", "gamified", "reflective"
         ]
-        
+
         # Select strategy with highest probability
         selected_strategy_idx = torch.argmax(strategy_probs).item()
         selected_strategy = strategies[selected_strategy_idx]
-        
+
         return selected_strategy
-    
+
     def monitor_engagement(self, behavioral_indicators: Dict[str, float]) -> float:
         """Monitor and predict learner engagement level."""
         features = list(behavioral_indicators.values())
-        
+
         # Pad or truncate to expected size
         while len(features) < 15:
             features.append(0.0)
         features = features[:15]
-        
+
         engagement_score = self.learning_algorithms["engagement_monitor"](
             torch.FloatTensor(features)
         ).item()
-        
+
         return engagement_score
-    
+
     def predict_performance(self, learner_history: List[Dict[str, float]],
                           current_session: Dict[str, Any]) -> Dict[str, float]:
         """Predict future performance based on history and current session."""
         # Extract features from history and current session
         features = self._extract_performance_features(learner_history, current_session)
-        
+
         # Predict performance metrics
         predicted_metrics = self.learning_algorithms["performance_predictor"](
             torch.FloatTensor(features)
         )
-        
+
         # Map to performance categories
         performance_prediction = {
             "compression_depth": torch.sigmoid(predicted_metrics[0]).item(),
@@ -350,14 +350,14 @@ class AutonomousDecisionEngine:
             "overall_technique": torch.sigmoid(predicted_metrics[4]).item(),
             "learning_progress": torch.sigmoid(predicted_metrics[5]).item()
         }
-        
+
         return performance_prediction
-    
+
     def _extract_intervention_features(self, learner_state: Dict[str, float],
                                      session_context: Dict[str, Any]) -> List[float]:
         """Extract features for intervention decision."""
         features = []
-        
+
         # Learner state features
         features.extend([
             learner_state.get("performance_decline", 0),
@@ -366,7 +366,7 @@ class AutonomousDecisionEngine:
             learner_state.get("frustration_level", 0),
             learner_state.get("attention_level", 1.0)
         ])
-        
+
         # Session context features
         features.extend([
             session_context.get("session_duration_minutes", 0) / 60.0,
@@ -375,18 +375,18 @@ class AutonomousDecisionEngine:
             session_context.get("help_requests", 0) / 3.0,
             session_context.get("difficulty_level", 0.5)
         ])
-        
+
         # Pad to expected size
         while len(features) < 20:
             features.append(0.0)
-        
+
         return features[:20]
-    
+
     def _extract_strategy_features(self, learner_profile: LearnerProfile,
                                  context: Dict[str, Any]) -> List[float]:
         """Extract features for strategy selection."""
         features = []
-        
+
         # Learner profile features
         features.extend([
             float(learner_profile.learning_style.value == "visual"),
@@ -395,11 +395,11 @@ class AutonomousDecisionEngine:
             learner_profile.optimal_difficulty_level,
             learner_profile.attention_span_minutes / 60.0
         ])
-        
+
         # Performance features
         avg_performance = np.mean(list(learner_profile.skill_progression.values()))
         features.append(avg_performance)
-        
+
         # Context features
         features.extend([
             context.get("current_performance", 0.5),
@@ -407,22 +407,22 @@ class AutonomousDecisionEngine:
             context.get("time_remaining", 30) / 60.0,
             context.get("complexity_level", 0.5)
         ])
-        
+
         # Pad to expected size
         while len(features) < 25:
             features.append(0.0)
-        
+
         return features[:25]
-    
+
     def _extract_performance_features(self, history: List[Dict[str, float]],
                                     current: Dict[str, Any]) -> List[float]:
         """Extract features for performance prediction."""
         features = []
-        
+
         # Historical performance trends
         if history:
             recent_sessions = history[-5:]  # Last 5 sessions
-            
+
             # Calculate trends
             performance_values = [s.get("overall_score", 0.5) for s in recent_sessions]
             features.extend([
@@ -432,7 +432,7 @@ class AutonomousDecisionEngine:
             ])
         else:
             features.extend([0.5, 0.0, 0.0])
-        
+
         # Current session features
         features.extend([
             current.get("current_score", 0.5),
@@ -440,18 +440,18 @@ class AutonomousDecisionEngine:
             current.get("attempts_made", 0) / 10.0,
             current.get("help_used", 0) / 5.0
         ])
-        
+
         # Pad to expected size
         while len(features) < 30:
             features.append(0.0)
-        
+
         return features[:30]
 
 
 class AutonomousTrainingAgent(BaseProcessor):
     """
     Autonomous Training Agent for Intelligent Medical Education.
-    
+
     This agent can independently:
     - Assess learner needs and adapt teaching strategies
     - Provide personalized instruction and feedback
@@ -459,41 +459,41 @@ class AutonomousTrainingAgent(BaseProcessor):
     - Collaborate with human instructors
     - Continuously improve through experience
     """
-    
+
     def __init__(self, agent_personality: AgentPersonality = AgentPersonality.ADAPTIVE_COACH):
         super().__init__(f"AutonomousTrainer_{agent_personality.value}", "5.0.0")
-        
+
         self.personality = agent_personality
         self.decision_engine = AutonomousDecisionEngine()
         self.pedagogical_strategies = self._initialize_strategies()
         self.learner_profiles = {}
         self.active_sessions = {}
-        
+
         # Agent learning and adaptation
         self.experience_memory = []
         self.strategy_effectiveness = {}
         self.adaptation_rate = 0.1
-        
+
         # Integration with other AI systems
         self.feedback_generator = None  # Will be initialized when needed
         self.audit_manager = AuditTrailManager()
-        
+
         logger.info("Autonomous Training Agent initialized",
                    personality=agent_personality.value,
                    agent_version=self.processor_version)
-    
+
     def _initialize_strategies(self) -> Dict[str, PedagogicalStrategy]:
         """Initialize pedagogical strategies based on agent personality."""
         strategies = {}
-        
+
         base_strategies = [
             "direct_instruction", "guided_discovery", "collaborative_learning",
             "problem_based", "simulation_based", "adaptive_feedback"
         ]
-        
+
         for strategy_name in base_strategies:
             strategies[strategy_name] = PedagogicalStrategy(strategy_name)
-        
+
         # Customize strategies based on personality
         if self.personality == AgentPersonality.ENCOURAGING_MENTOR:
             strategies["positive_reinforcement"] = PedagogicalStrategy("positive_reinforcement")
@@ -501,15 +501,15 @@ class AutonomousTrainingAgent(BaseProcessor):
             strategies["structured_progression"] = PedagogicalStrategy("structured_progression")
         elif self.personality == AgentPersonality.RESEARCH_ORIENTED:
             strategies["evidence_based_teaching"] = PedagogicalStrategy("evidence_based_teaching")
-        
+
         return strategies
-    
+
     async def start_training_session(self, learner_profile: LearnerProfile,
                                    training_objectives: List[str]) -> ProcessingResult:
         """Start an autonomous training session with a learner."""
         try:
             session_id = f"session_{learner_profile.learner_id}_{int(time.time())}"
-            
+
             # Create training session
             session = TrainingSession(
                 session_id=session_id,
@@ -524,20 +524,20 @@ class AutonomousTrainingAgent(BaseProcessor):
                 learner_engagement=1.0,
                 session_effectiveness=0.0
             )
-            
+
             self.active_sessions[session_id] = session
             self.learner_profiles[learner_profile.learner_id] = learner_profile
-            
+
             # Select initial teaching strategy
             initial_strategy = self.decision_engine.select_teaching_strategy(
                 learner_profile, {"session_start": True}
             )
-            
+
             # Apply pedagogical strategy
             strategy_config = self.pedagogical_strategies[initial_strategy].apply_strategy(
                 learner_profile, {}
             )
-            
+
             # Log session start
             self.audit_manager.log_event(
                 event_type=AuditEventType.SYSTEM_CONFIGURATION,
@@ -551,12 +551,12 @@ class AutonomousTrainingAgent(BaseProcessor):
                     "training_objectives": training_objectives
                 }
             )
-            
+
             # Generate initial instruction
             initial_instruction = await self._generate_personalized_instruction(
                 learner_profile, training_objectives[0], strategy_config
             )
-            
+
             results = {
                 "session_management": {
                     "session_id": session_id,
@@ -573,7 +573,7 @@ class AutonomousTrainingAgent(BaseProcessor):
                     "collaborative_mode": True
                 }
             }
-            
+
             return ProcessingResult(
                 success=True,
                 data=results,
@@ -583,7 +583,7 @@ class AutonomousTrainingAgent(BaseProcessor):
                     "learner_id": learner_profile.learner_id
                 }
             )
-            
+
         except Exception as e:
             logger.error("Failed to start autonomous training session", error=str(e))
             return ProcessingResult(
@@ -591,7 +591,7 @@ class AutonomousTrainingAgent(BaseProcessor):
                 error_message=f"Session start failed: {str(e)}",
                 data={}
             )
-    
+
     async def process_learner_interaction(self, session_id: str,
                                         interaction_data: Dict[str, Any]) -> ProcessingResult:
         """Process learner interaction and provide autonomous response."""
@@ -602,63 +602,63 @@ class AutonomousTrainingAgent(BaseProcessor):
                     error_message="Session not found",
                     data={}
                 )
-            
+
             session = self.active_sessions[session_id]
             learner_profile = self.learner_profiles[session.learner_id]
-            
+
             # Analyze learner state
             learner_state = self._analyze_learner_state(interaction_data)
-            
+
             # Monitor engagement
             engagement_score = self.decision_engine.monitor_engagement(
                 interaction_data.get("behavioral_indicators", {})
             )
-            
+
             session.learner_engagement = engagement_score
-            
+
             # Decide if intervention is needed
             should_intervene, intervention_type = self.decision_engine.should_intervene(
                 learner_state, {"session_id": session_id}
             )
-            
+
             agent_response = {}
-            
+
             if should_intervene:
                 # Generate intervention
                 intervention_response = await self._generate_intervention(
                     learner_profile, learner_state, intervention_type
                 )
                 agent_response["intervention"] = intervention_response
-                
+
                 # Adapt strategy if needed
                 if intervention_type in ["performance_support", "engagement_boost"]:
                     new_strategy = self._adapt_teaching_strategy(
                         learner_profile, learner_state
                     )
                     agent_response["strategy_adaptation"] = new_strategy
-            
+
             # Provide continuous feedback
             if interaction_data.get("performance_data"):
                 feedback = await self._generate_adaptive_feedback(
                     learner_profile, interaction_data["performance_data"]
                 )
                 agent_response["adaptive_feedback"] = feedback
-            
+
             # Update session data
             session.performance_metrics.update(
                 interaction_data.get("performance_data", {})
             )
-            
+
             # Predict future performance
             performance_prediction = self.decision_engine.predict_performance(
                 learner_profile.session_history, asdict(session)
             )
-            
+
             agent_response["performance_prediction"] = performance_prediction
-            
+
             # Learn from interaction
             self._learn_from_interaction(session_id, interaction_data, agent_response)
-            
+
             results = {
                 "autonomous_response": agent_response,
                 "learner_analysis": {
@@ -674,7 +674,7 @@ class AutonomousTrainingAgent(BaseProcessor):
                     "total_objectives": len(session.training_objectives)
                 }
             }
-            
+
             return ProcessingResult(
                 success=True,
                 data=results,
@@ -684,7 +684,7 @@ class AutonomousTrainingAgent(BaseProcessor):
                     "agent_adapted": should_intervene
                 }
             )
-            
+
         except Exception as e:
             logger.error("Failed to process learner interaction", error=str(e))
             return ProcessingResult(
@@ -692,19 +692,19 @@ class AutonomousTrainingAgent(BaseProcessor):
                 error_message=f"Interaction processing failed: {str(e)}",
                 data={}
             )
-    
+
     def _analyze_learner_state(self, interaction_data: Dict[str, Any]) -> Dict[str, float]:
         """Analyze current learner state from interaction data."""
         performance_data = interaction_data.get("performance_data", {})
         behavioral_data = interaction_data.get("behavioral_indicators", {})
-        
+
         # Calculate performance decline
         recent_scores = performance_data.get("recent_scores", [0.5])
         if len(recent_scores) > 1:
             performance_decline = max(0, recent_scores[0] - recent_scores[-1])
         else:
             performance_decline = 0
-        
+
         learner_state = {
             "performance_decline": performance_decline,
             "engagement_level": behavioral_data.get("engagement", 1.0),
@@ -713,16 +713,16 @@ class AutonomousTrainingAgent(BaseProcessor):
             "attention_level": behavioral_data.get("attention", 1.0),
             "current_performance": performance_data.get("current_score", 0.5)
         }
-        
+
         return learner_state
-    
+
     async def _generate_personalized_instruction(self, learner_profile: LearnerProfile,
                                                objective: str,
                                                strategy_config: Dict[str, Any]) -> Dict[str, Any]:
         """Generate personalized instruction for the learner."""
         # Create instruction based on learning style and strategy
         instruction_method = strategy_config.get("instruction_method", "adaptive_mixed")
-        
+
         instruction = {
             "method": instruction_method,
             "content": f"Let's work on {objective} using {instruction_method} approach",
@@ -736,9 +736,9 @@ class AutonomousTrainingAgent(BaseProcessor):
                 "cultural_sensitivity": learner_profile.cultural_background is not None
             }
         }
-        
+
         return instruction
-    
+
     async def _generate_intervention(self, learner_profile: LearnerProfile,
                                    learner_state: Dict[str, float],
                                    intervention_type: str) -> Dict[str, Any]:
@@ -749,7 +749,7 @@ class AutonomousTrainingAgent(BaseProcessor):
             "clarification_needed": "I notice you might need some clarification. Let me explain this differently",
             "general_guidance": "You're doing well! Here's a tip to help you improve further"
         }
-        
+
         intervention = {
             "type": intervention_type,
             "message": intervention_strategies.get(intervention_type, "Let me help you with this"),
@@ -757,18 +757,19 @@ class AutonomousTrainingAgent(BaseProcessor):
             "expected_outcome": "Improved performance and engagement",
             "follow_up_required": intervention_type in ["performance_support", "clarification_needed"]
         }
-        
+
         return intervention
-    
+
     async def _generate_adaptive_feedback(self, learner_profile: LearnerProfile,
                                         performance_data: Dict[str, Any]) -> Dict[str, Any]:
         """Generate adaptive feedback based on performance."""
         # Initialize feedback generator if needed
         if self.feedback_generator is None:
-            from ..research.llm_integration import IntelligentFeedbackGenerator, LLMConfig
+            from ..research.llm_integration import LLMConfig
             config = LLMConfig(enable_personalization=True)
-            self.feedback_generator = IntelligentFeedbackGenerator(config)
-        
+            # Mock feedback generator for demonstration
+            self.feedback_generator = None
+
         # Create medical context for feedback
         medical_context = MedicalContext(
             procedure_type="cpr_training",
@@ -780,14 +781,14 @@ class AutonomousTrainingAgent(BaseProcessor):
             safety_concerns=[],
             language_preference=learner_profile.language_preference
         )
-        
+
         # Generate intelligent feedback
         feedback_input = {
             "feedback_type": "technique_correction",
             "medical_context": asdict(medical_context),
             "user_id": learner_profile.learner_id
         }
-        
+
         # Mock feedback for demonstration
         adaptive_feedback = {
             "personalized_message": "Based on your learning style and current performance...",
@@ -797,15 +798,15 @@ class AutonomousTrainingAgent(BaseProcessor):
             "learning_style_adapted": True,
             "personality_matched": True
         }
-        
+
         return adaptive_feedback
-    
+
     def _adapt_teaching_strategy(self, learner_profile: LearnerProfile,
                                learner_state: Dict[str, float]) -> str:
         """Adapt teaching strategy based on learner state."""
         current_performance = learner_state.get("current_performance", 0.5)
         engagement = learner_state.get("engagement_level", 1.0)
-        
+
         # Strategy adaptation logic
         if current_performance < 0.6 and engagement > 0.7:
             # Struggling but engaged - provide more support
@@ -819,9 +820,9 @@ class AutonomousTrainingAgent(BaseProcessor):
         else:
             # Default adaptive approach
             new_strategy = "adaptive_feedback"
-        
+
         return new_strategy
-    
+
     def _create_intervention_action_plan(self, intervention_type: str,
                                        learner_state: Dict[str, float]) -> List[str]:
         """Create action plan for intervention."""
@@ -845,9 +846,9 @@ class AutonomousTrainingAgent(BaseProcessor):
                 "Check comprehension before proceeding"
             ]
         }
-        
+
         return action_plans.get(intervention_type, ["Provide general support"])
-    
+
     def _define_success_criteria(self, objective: str) -> List[str]:
         """Define success criteria for training objective."""
         criteria_mapping = {
@@ -855,19 +856,19 @@ class AutonomousTrainingAgent(BaseProcessor):
             "compression_rate": ["Maintain 100-120 compressions per minute", "Consistent rhythm"],
             "hand_position": ["Correct placement on lower sternum", "Proper hand positioning"]
         }
-        
+
         return criteria_mapping.get(objective, ["Complete the exercise successfully"])
-    
+
     def _calculate_session_progress(self, session: TrainingSession) -> float:
         """Calculate session progress percentage."""
         total_objectives = len(session.training_objectives)
         completed_activities = len(session.activities_completed)
-        
+
         if total_objectives == 0:
             return 0.0
-        
+
         return min(100.0, (completed_activities / total_objectives) * 100)
-    
+
     def _learn_from_interaction(self, session_id: str, interaction_data: Dict[str, Any],
                               agent_response: Dict[str, Any]):
         """Learn and adapt from interaction outcomes."""
@@ -879,13 +880,13 @@ class AutonomousTrainingAgent(BaseProcessor):
             "agent_response": agent_response,
             "outcome_pending": True  # Will be updated when outcome is known
         }
-        
+
         self.experience_memory.append(experience)
-        
+
         # Limit memory size
         if len(self.experience_memory) > 1000:
             self.experience_memory = self.experience_memory[-1000:]
-    
+
     async def end_training_session(self, session_id: str) -> ProcessingResult:
         """End training session and generate summary."""
         try:
@@ -895,13 +896,13 @@ class AutonomousTrainingAgent(BaseProcessor):
                     error_message="Session not found",
                     data={}
                 )
-            
+
             session = self.active_sessions[session_id]
             session.end_time = datetime.now()
-            
+
             # Calculate session effectiveness
             session.session_effectiveness = self._calculate_session_effectiveness(session)
-            
+
             # Generate session summary
             session_summary = {
                 "session_id": session_id,
@@ -914,14 +915,14 @@ class AutonomousTrainingAgent(BaseProcessor):
                 "agent_adaptations_made": len(session.agent_adaptations),
                 "feedback_instances": len(session.feedback_provided)
             }
-            
+
             # Update learner profile
             learner_profile = self.learner_profiles[session.learner_id]
             learner_profile.session_history.append(asdict(session))
-            
+
             # Remove from active sessions
             del self.active_sessions[session_id]
-            
+
             # Log session completion
             self.audit_manager.log_event(
                 event_type=AuditEventType.SYSTEM_CONFIGURATION,
@@ -929,13 +930,13 @@ class AutonomousTrainingAgent(BaseProcessor):
                 severity=AuditSeverity.INFO,
                 metadata=session_summary
             )
-            
+
             return ProcessingResult(
                 success=True,
                 data={"session_summary": session_summary},
                 metadata={"session_id": session_id, "session_completed": True}
             )
-            
+
         except Exception as e:
             logger.error("Failed to end training session", error=str(e))
             return ProcessingResult(
@@ -943,18 +944,18 @@ class AutonomousTrainingAgent(BaseProcessor):
                 error_message=f"Session end failed: {str(e)}",
                 data={}
             )
-    
+
     def _calculate_session_effectiveness(self, session: TrainingSession) -> float:
         """Calculate overall session effectiveness score."""
         # Factors: completion rate, engagement, performance improvement
         completion_rate = len(session.activities_completed) / len(session.training_objectives)
         engagement_score = session.learner_engagement
-        
+
         # Mock performance improvement calculation
         performance_improvement = 0.1  # Would be calculated from actual data
-        
-        effectiveness = (completion_rate * 0.4 + 
-                        engagement_score * 0.4 + 
+
+        effectiveness = (completion_rate * 0.4 +
+                        engagement_score * 0.4 +
                         performance_improvement * 0.2)
-        
+
         return min(1.0, effectiveness)

@@ -17,7 +17,7 @@ from .synthetic import SyntheticDataGenerator, CPRScenarioGenerator
 __all__ = [
     "RealDatasetCollector",
     "MedicalDatasetManager",
-    "MedicalDataPreprocessor", 
+    "MedicalDataPreprocessor",
     "CPRVideoProcessor",
     "MedicalDataValidator",
     "ComplianceValidator",

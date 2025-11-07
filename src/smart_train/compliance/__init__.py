@@ -18,7 +18,7 @@ from .quality_management import QualityManager
 
 __all__ = [
     "ISO13485Compliance",
-    "IEC62304Compliance", 
+    "IEC62304Compliance",
     "AuditTrailManager",
     "RiskManager",
     "QualityManager"

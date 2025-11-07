@@ -17,7 +17,7 @@ from .experiment_manager import ExperimentManager, ABTestManager
 __all__ = [
     "TrainingPipeline",
     "PipelineConfig",
-    "DeploymentPipeline", 
+    "DeploymentPipeline",
     "DeploymentConfig",
     "MonitoringPipeline",
     "ModelMonitor",

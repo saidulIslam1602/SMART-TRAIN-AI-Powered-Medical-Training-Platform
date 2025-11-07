@@ -18,7 +18,7 @@ from .alert_manager import AlertManager, AlertRule
 __all__ = [
     "ModelMonitor",
     "ModelDriftDetector",
-    "PerformanceMonitor", 
+    "PerformanceMonitor",
     "SystemHealthMonitor",
     "AnalyticsDashboard",
     "MetricsCollector",

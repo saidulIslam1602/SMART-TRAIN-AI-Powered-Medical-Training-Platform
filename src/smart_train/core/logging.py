@@ -20,18 +20,18 @@ from .exceptions import SmartTrainException
 class MedicalAuditProcessor:
     """
     Processor for medical audit trail logging.
-    
+
     This processor ensures all logs meet medical device compliance
     requirements for audit trails and traceability.
     """
-    
+
     def __call__(self, logger, method_name, event_dict):
         """Process log entry for medical compliance."""
         # Add audit trail information
         event_dict["audit_timestamp"] = datetime.utcnow().isoformat()
         event_dict["audit_level"] = event_dict.get("level", "info").upper()
         event_dict["compliance_required"] = True
-        
+
         # Add medical context if available
         if "medical_context" not in event_dict:
             event_dict["medical_context"] = {
@@ -39,35 +39,35 @@ class MedicalAuditProcessor:
                 "training_session": False,
                 "model_inference": False
             }
-        
+
         return event_dict
 
 
 class ComplianceFilter(logging.Filter):
     """
     Logging filter for medical compliance requirements.
-    
+
     This filter ensures sensitive medical data is properly handled
     and compliance violations are flagged.
     """
-    
+
     def filter(self, record):
         """Filter log records for compliance."""
         # Add compliance metadata
         record.compliance_checked = True
         record.medical_grade = True
-        
+
         # Check for sensitive data patterns
         message = str(record.getMessage()).lower()
         sensitive_patterns = [
-            "patient", "medical_record", "phi", "pii", 
+            "patient", "medical_record", "phi", "pii",
             "ssn", "medical_id", "diagnosis"
         ]
-        
+
         record.contains_sensitive_data = any(
             pattern in message for pattern in sensitive_patterns
         )
-        
+
         return True
 
 
@@ -79,7 +79,7 @@ def setup_logging(
 ) -> None:
     """
     Setup structured logging for SMART-TRAIN platform.
-    
+
     Args:
         log_level: Logging level (DEBUG, INFO, WARNING, ERROR, CRITICAL)
         log_dir: Directory for log files
@@ -90,7 +90,7 @@ def setup_logging(
     if log_dir:
         log_dir = Path(log_dir)
         log_dir.mkdir(parents=True, exist_ok=True)
-    
+
     # Configure structlog processors
     processors = [
         structlog.stdlib.filter_by_level,
@@ -101,17 +101,17 @@ def setup_logging(
         structlog.processors.StackInfoRenderer(),
         structlog.processors.format_exc_info,
     ]
-    
+
     # Add medical audit processor if enabled
     if enable_audit_trail:
         processors.append(MedicalAuditProcessor())
-    
+
     # Configure output format
     if enable_console:
         processors.append(structlog.dev.ConsoleRenderer())
     else:
         processors.append(structlog.processors.JSONRenderer())
-    
+
     # Configure structlog
     structlog.configure(
         processors=processors,
@@ -119,18 +119,18 @@ def setup_logging(
         logger_factory=structlog.stdlib.LoggerFactory(),
         cache_logger_on_first_use=True,
     )
-    
+
     # Configure standard library logging
     logging.basicConfig(
         format="%(message)s",
         stream=sys.stdout,
         level=getattr(logging, log_level.upper()),
     )
-    
+
     # Add compliance filter to root logger
     root_logger = logging.getLogger()
     root_logger.addFilter(ComplianceFilter())
-    
+
     # Setup file handlers if log directory is specified
     if log_dir:
         # Application logs
@@ -141,7 +141,7 @@ def setup_logging(
             )
         )
         root_logger.addHandler(app_handler)
-        
+
         # Audit trail logs (separate file for compliance)
         if enable_audit_trail:
             audit_handler = logging.FileHandler(log_dir / "audit_trail.log")
@@ -151,7 +151,7 @@ def setup_logging(
                 )
             )
             audit_handler.addFilter(ComplianceFilter())
-            
+
             # Create audit logger
             audit_logger = logging.getLogger("smart_train.audit")
             audit_logger.addHandler(audit_handler)
@@ -161,10 +161,10 @@ def setup_logging(
 def get_logger(name: str) -> structlog.BoundLogger:
     """
     Get a structured logger instance.
-    
+
     Args:
         name: Logger name (typically __name__)
-        
+
     Returns:
         Configured structlog BoundLogger instance
     """
@@ -174,26 +174,26 @@ def get_logger(name: str) -> structlog.BoundLogger:
 class MedicalLogger:
     """
     Specialized logger for medical operations.
-    
+
     This logger provides additional methods for logging medical-specific
     events with proper compliance and audit trail support.
     """
-    
+
     def __init__(self, name: str):
         """Initialize medical logger."""
         self.logger = get_logger(name)
         self.audit_logger = logging.getLogger("smart_train.audit")
-    
+
     def log_medical_event(
-        self, 
-        event_type: str, 
-        message: str, 
+        self,
+        event_type: str,
+        message: str,
         context: Optional[Dict[str, Any]] = None,
         level: str = "info"
     ) -> None:
         """
         Log a medical event with proper audit trail.
-        
+
         Args:
             event_type: Type of medical event
             message: Event description
@@ -207,20 +207,20 @@ class MedicalLogger:
             "timestamp": datetime.utcnow().isoformat(),
             "compliance_event": True
         }
-        
+
         # Log to main logger
         getattr(self.logger, level.lower())(message, **log_data)
-        
+
         # Log to audit trail (avoid 'message' conflict)
         audit_log_data = {k: v for k, v in log_data.items() if k != 'message'}
         self.audit_logger.info(
             f"MEDICAL_EVENT: {event_type} - {message}",
             extra=audit_log_data
         )
-    
+
     def log_model_inference(
-        self, 
-        model_name: str, 
+        self,
+        model_name: str,
         input_data_hash: str,
         output_summary: Dict[str, Any],
         performance_metrics: Optional[Dict[str, float]] = None
@@ -236,10 +236,10 @@ class MedicalLogger:
                 "performance_metrics": performance_metrics or {}
             }
         )
-    
+
     def log_data_processing(
-        self, 
-        operation: str, 
+        self,
+        operation: str,
         data_source: str,
         records_processed: int,
         quality_metrics: Optional[Dict[str, Any]] = None
@@ -255,10 +255,10 @@ class MedicalLogger:
                 "quality_metrics": quality_metrics or {}
             }
         )
-    
+
     def log_compliance_check(
-        self, 
-        check_type: str, 
+        self,
+        check_type: str,
         result: bool,
         details: Optional[Dict[str, Any]] = None
     ) -> None:
@@ -274,7 +274,7 @@ class MedicalLogger:
             },
             level=level
         )
-    
+
     def log_exception(self, exception: Exception, context: Optional[Dict[str, Any]] = None) -> None:
         """Log exceptions with medical compliance context."""
         if isinstance(exception, SmartTrainException):

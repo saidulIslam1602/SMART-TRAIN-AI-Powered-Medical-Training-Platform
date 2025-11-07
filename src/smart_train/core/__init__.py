@@ -16,7 +16,7 @@ from .base import BaseModel, BaseProcessor
 __all__ = [
     "SmartTrainConfig",
     "SmartTrainException",
-    "MedicalComplianceError", 
+    "MedicalComplianceError",
     "DataValidationError",
     "get_logger",
     "setup_logging",
