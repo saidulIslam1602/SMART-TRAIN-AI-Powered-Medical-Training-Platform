@@ -279,18 +279,18 @@ class CPRQualityAssessmentModel(BaseModel):
             # Create result
             result = ProcessingResult(
                 success=True,
+                message="CPR quality assessment completed successfully",
                 data={
                     'cpr_metrics': cpr_metrics.__dict__,
                     'inference_time_ms': inference_time * 1000,
                     'model_version': self.model_version,
-                    'aha_compliant': cpr_metrics.aha_compliant
-                },
-                metadata={
+                    'aha_compliant': cpr_metrics.aha_compliant,
                     'model_id': self.model_id,
                     'device': str(self.device),
-                    'input_shape': input_data.shape,
+                    'input_shape': list(input_data.shape),
                     'processing_timestamp': torch.tensor(0.0).item()  # Current timestamp
-                }
+                },
+                processing_time_ms=inference_time * 1000
             )
 
             # Log inference event
@@ -311,7 +311,7 @@ class CPRQualityAssessmentModel(BaseModel):
             logger.error("CPR quality assessment failed", error=str(e))
             return ProcessingResult(
                 success=False,
-                error_message=f"CPR quality assessment failed: {e}",
+                message=f"CPR quality assessment failed: {e}",
                 data={}
             )
 
