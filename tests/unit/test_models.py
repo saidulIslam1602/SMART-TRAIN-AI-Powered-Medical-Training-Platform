@@ -82,9 +82,10 @@ class TestCPRQualityAssessmentModel:
         assert model.model_name == "CPRQualityAssessment"
         assert model.model_version == "2.0.0"
         
+    @patch('smart_train.models.cpr_quality_model.logger')
     @patch('smart_train.models.cpr_quality_model.AuditTrailManager')
     @patch('smart_train.models.cpr_quality_model.CPRQualityNet')
-    def test_model_predict_success(self, mock_net, mock_audit):
+    def test_model_predict_success(self, mock_net, mock_audit, mock_logger):
         """Test successful prediction."""
         # Mock audit manager to avoid logging issues
         mock_audit.return_value.log_event = Mock()
@@ -116,9 +117,10 @@ class TestCPRQualityAssessmentModel:
         assert isinstance(result, ProcessingResult)
         assert result.success is True
         
+    @patch('smart_train.models.cpr_quality_model.logger')
     @patch('smart_train.models.cpr_quality_model.AuditTrailManager')
     @patch('smart_train.models.cpr_quality_model.CPRQualityNet')
-    def test_model_predict_invalid_input(self, mock_net, mock_audit):
+    def test_model_predict_invalid_input(self, mock_net, mock_audit, mock_logger):
         """Test prediction with invalid input."""
         # Mock audit manager to avoid logging issues
         mock_audit.return_value.log_event = Mock()
@@ -170,8 +172,9 @@ class TestRealTimeFeedbackModel:
         assert model.model_name == "RealTimeFeedback"
         assert model.model_version == "2.0.0"
         
+    @patch('smart_train.models.realtime_feedback.logger')
     @patch('smart_train.models.realtime_feedback.AuditTrailManager')
-    def test_model_predict_success(self, mock_audit):
+    def test_model_predict_success(self, mock_audit, mock_logger):
         """Test successful feedback prediction."""
         # Mock the audit manager to avoid logging issues
         mock_audit.return_value.log_event = Mock()
@@ -217,9 +220,10 @@ class TestRealTimeFeedbackModel:
 class TestModelIntegration:
     """Test model integration scenarios."""
     
+    @patch('smart_train.models.cpr_quality_model.logger')
     @patch('smart_train.models.cpr_quality_model.AuditTrailManager')
     @patch('smart_train.models.cpr_quality_model.CPRQualityNet')
-    def test_cpr_to_feedback_pipeline(self, mock_net, mock_audit):
+    def test_cpr_to_feedback_pipeline(self, mock_net, mock_audit, mock_logger):
         """Test CPR assessment to feedback pipeline."""
         # Mock audit manager to avoid logging issues
         mock_audit.return_value.log_event = Mock()
