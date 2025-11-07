@@ -215,8 +215,8 @@ class CPRQualityAssessmentModel(BaseModel):
             self.model.to(self.device)
             
             if model_path.exists():
-                # Load pre-trained weights
-                checkpoint = torch.load(model_path, map_location=self.device)
+                # Load pre-trained weights (secure loading)
+                checkpoint = torch.load(model_path, map_location=self.device, weights_only=True)
                 self.model.load_state_dict(checkpoint['model_state_dict'])
                 logger.info("Pre-trained model loaded", model_path=str(model_path))
             else:
