@@ -411,7 +411,7 @@ class MedicalVisionTransformer(nn.Module):
         patches = patches.flatten(2).transpose(1, 2)  # [batch_size, num_patches, d_model]
 
         # Add class token
-        cls_tokens = self.cls_token.expand(batch_size, -1, -1)
+        cls_tokens = self.cls_token.expand(_batch_size, -1, -1)
         x = torch.cat([cls_tokens, patches], dim=1)
 
         # Add positional embedding

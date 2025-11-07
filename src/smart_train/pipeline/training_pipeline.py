@@ -518,7 +518,7 @@ class TrainingPipeline(BaseProcessor):
             )
 
             # Train model
-            training_result = trainer.train(train_dataset)
+            training_result = _trainer.train(train_dataset)
 
             if training_result.success:
                 self.best_model_path = Path(training_result.data.get("model_path", ""))

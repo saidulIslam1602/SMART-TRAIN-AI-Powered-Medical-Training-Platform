@@ -193,7 +193,7 @@ class AuditTrailManager:
             audit_event=AuditEvent(
                 event_id=str(uuid.uuid4()),
                 event_type=event_type,
-                _timestamp=datetime.now(timezone.utc),
+                timestamp=datetime.now(timezone.utc),
                 user_id=user_id,
                 session_id=session_id,
                 description=description,
