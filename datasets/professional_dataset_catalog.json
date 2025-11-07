@@ -1,0 +1,56 @@
+{
+  "dataset_catalog": {
+    "version": "1.0",
+    "project": "SMART-TRAIN Medical AI Platform",
+    "purpose": "CPR training quality assessment and improvement",
+    "compliance": [
+      "ISO 13485",
+      "IEC 62304",
+      "GDPR",
+      "HIPAA"
+    ]
+  },
+  "datasets": {
+    "synthetic_cpr_scenarios": {
+      "type": "synthetic",
+      "size_mb": 50,
+      "count": 3,
+      "quality_levels": [
+        "high",
+        "medium",
+        "low"
+      ],
+      "annotations": [
+        "pose_keypoints",
+        "compression_metrics",
+        "quality_scores"
+      ],
+      "medical_standards": "AHA_CPR_2020"
+    },
+    "mediapipe_pose_samples": {
+      "type": "real_world",
+      "source": "Google MediaPipe",
+      "size_mb": 150,
+      "purpose": "Pose estimation baseline",
+      "license": "Apache 2.0"
+    },
+    "public_demonstration_references": {
+      "type": "reference",
+      "source": "Medical institutions",
+      "purpose": "Validation and standards",
+      "compliance": "Medical ethics approved"
+    }
+  },
+  "data_engineering": {
+    "preprocessing_pipeline": "Automated video analysis with pose extraction",
+    "quality_validation": "Medical expert review integration",
+    "version_control": "DVC with Azure storage backend",
+    "monitoring": "Continuous data quality assessment"
+  },
+  "business_impact": {
+    "training_improvement": "Real-time feedback for CPR technique",
+    "quality_standardization": "Objective performance measurement",
+    "scalability": "Cloud-ready for global deployment",
+    "cost_reduction": "Automated assessment reduces instructor overhead"
+  }
+}

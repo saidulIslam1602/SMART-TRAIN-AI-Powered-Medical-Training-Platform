@@ -1,0 +1,85 @@
+data_sources:
+  # Real dataset sources
+  coco_pose:
+    name: "COCO-Pose Medical Extended"
+    url: "http://images.cocodataset.org/annotations/person_keypoints_train2017.zip"
+    local_path: "./datasets/coco_pose_medical/"
+    description: "COCO pose dataset extended with medical procedure annotations"
+    size: "241MB"
+    num_images: 64115
+    annotations: ["pose_keypoints", "medical_actions", "technique_quality"]
+    
+  mediapipe_samples:
+    name: "MediaPipe Pose Samples"
+    url: "https://storage.googleapis.com/mediapipe-assets/pose_landmark_detection.zip"
+    local_path: "./datasets/mediapipe_samples/"
+    description: "MediaPipe pose detection sample videos"
+    size: "150MB"
+    
+  kinetics_medical:
+    name: "Kinetics-400 Medical Subset"
+    url: "https://deepmind.com/research/open-source/kinetics"
+    local_path: "./datasets/kinetics_medical/"
+    description: "Medical procedure videos from Kinetics-400"
+    size: "2.5GB"
+    filter_classes: ["cpr", "first_aid", "medical_examination"]
+    
+  # Synthetic data configuration
+  synthetic_cpr:
+    name: "Synthetic CPR Training Videos"
+    local_path: "./datasets/synthetic_data/cpr/"
+    description: "Procedurally generated CPR training scenarios"
+    target_size: "5000 videos"
+    scenarios: ["standard_cpr", "pediatric_cpr", "confined_space", "multi_patient"]
+    
+  # Medical simulation data
+  simulation_labs:
+    name: "Medical Simulation Laboratory Data"
+    local_path: "./datasets/simulation_labs/"
+    description: "Real training session recordings from simulation labs"
+    privacy_level: "anonymized"
+    consent_required: true
+    
+# Data processing configuration
+preprocessing:
+  video:
+    target_resolution: [1280, 720]
+    target_fps: 30
+    max_duration_seconds: 300
+    min_duration_seconds: 10
+    
+  pose_estimation:
+    model: "mediapipe"
+    confidence_threshold: 0.5
+    keypoint_format: "coco_17"
+    
+  annotations:
+    format: "coco"
+    quality_metrics: ["compression_depth", "rate", "hand_position", "release"]
+    medical_standards: "aha_guidelines_2020"
+    
+# Data validation
+validation:
+  quality_checks:
+    min_video_quality: 720
+    min_annotation_completeness: 0.95
+    max_missing_keypoints: 0.1
+    
+  medical_compliance:
+    hipaa_compliance: true
+    gdpr_compliance: true
+    anonymization_required: true
+    
+  bias_detection:
+    demographic_balance: true
+    performance_fairness: true
+    representation_check: true
+
+# Data storage structure
+storage_structure:
+  raw_data: "./datasets/raw/"
+  processed_data: "./datasets/processed/"
+  annotations: "./datasets/annotations/"
+  synthetic_data: "./datasets/synthetic/"
+  validation_data: "./datasets/validation/"
+  test_data: "./datasets/test/"

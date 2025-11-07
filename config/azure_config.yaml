@@ -1,0 +1,52 @@
+azure:
+  subscription_id: ${AZURE_SUBSCRIPTION_ID}
+  resource_group: ${AZURE_RESOURCE_GROUP}
+  workspace_name: ${AZURE_ML_WORKSPACE_NAME}
+  location: ${AZURE_LOCATION}
+  
+  # Compute Configuration
+  compute:
+    training_cluster:
+      name: "smart-train-cluster"
+      type: "amlcompute"
+      min_instances: 0
+      max_instances: 4
+      vm_size: "Standard_DS3_v2"
+      idle_seconds_before_scaledown: 300
+    
+    inference_cluster:
+      name: "smart-train-inference"
+      type: "amlcompute"
+      min_instances: 1
+      max_instances: 3
+      vm_size: "Standard_DS2_v2"
+      
+    gpu_cluster:
+      name: "smart-train-gpu"
+      type: "amlcompute"
+      min_instances: 0
+      max_instances: 2
+      vm_size: "Standard_NC6s_v3"  # Tesla V100
+      
+  # Storage Configuration
+  storage:
+    account_name: ${AZURE_STORAGE_ACCOUNT_NAME}
+    container_name: ${AZURE_STORAGE_CONTAINER_NAME}
+    data_store_name: "medical_training_datastore"
+    
+  # Model Registry
+  model_registry:
+    name: "smart-train-models"
+    description: "Medical training AI models"
+    
+  # Environment Configuration
+  environments:
+    training_env:
+      name: "smart-train-training-env"
+      conda_file: "../deployment/conda_env.yml"
+      docker_image: "mcr.microsoft.com/azureml/openmpi4.1.0-cuda11.1-cudnn8-ubuntu20.04:latest"
+      
+    inference_env:
+      name: "smart-train-inference-env"
+      conda_file: "../deployment/inference_env.yml"
+      docker_image: "mcr.microsoft.com/azureml/minimal-ubuntu20.04-py38-cpu-inference:latest"

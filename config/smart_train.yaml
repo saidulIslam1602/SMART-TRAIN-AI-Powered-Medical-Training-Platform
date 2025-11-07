@@ -1,0 +1,77 @@
+# SMART-TRAIN Configuration File
+# Production-ready configuration for medical AI training platform
+
+# Database Configuration
+database:
+  host: localhost
+  port: 5432
+  database: smart_train_db
+  username: smart_train_user
+  password: ""  # Set via environment variable
+  ssl_mode: prefer
+  pool_size: 10
+  max_overflow: 20
+
+# Azure Configuration
+azure:
+  subscription_id: ""  # Set via environment variable
+  resource_group: smart-train-rg
+  workspace_name: smart-train-ml-workspace
+  location: eastus
+  storage_account: smarttraindata
+  container_name: medical-training-data
+  key_vault_name: smart-train-kv
+
+# Model Configuration
+model:
+  pose_estimation_model: mediapipe
+  pose_confidence_threshold: 0.5
+  action_recognition_model: transformer_net
+  quality_assessment_model: medical_quality_net
+  inference_batch_size: 1
+  max_inference_time_ms: 100
+  model_cache_size: 3
+
+# Medical Compliance Configuration
+medical_compliance:
+  iso_13485_enabled: true
+  iec_62304_enabled: true
+  hipaa_compliance: true
+  gdpr_compliance: true
+  audit_trail_enabled: true
+  data_anonymization_required: true
+  quality_management_system: true
+  risk_management_enabled: true
+
+# Data Processing Configuration
+data_processing:
+  video_target_resolution: [1280, 720]
+  video_target_fps: 30
+  max_video_duration_seconds: 300
+  min_video_duration_seconds: 10
+  pose_keypoint_format: coco_17
+  data_augmentation_enabled: true
+  parallel_processing_workers: 4
+  quality_validation_threshold: 0.8
+
+# API Configuration
+api:
+  host: 0.0.0.0
+  port: 8000
+  debug: false
+  cors_enabled: true
+  cors_origins: ["*"]
+  rate_limit_requests_per_minute: 100
+  max_request_size_mb: 100
+  jwt_secret_key: ""  # Set via environment variable
+  jwt_expiration_hours: 24
+
+# Logging Configuration
+logging:
+  level: INFO
+  log_dir: logs
+  enable_audit_trail: true
+  enable_console: true
+  enable_file_logging: true
+  max_log_file_size_mb: 100
+  log_retention_days: 90
